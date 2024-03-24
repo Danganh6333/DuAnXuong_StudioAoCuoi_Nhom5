@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const App = () => {
+const DangNhap = () => {
   return (
     <View>
-      <Text>App</Text>
+      <Text>DangNhap</Text>
     </View>
   )
 }
 
-export default App
+export default DangNhap
 
 const styles = StyleSheet.create({})

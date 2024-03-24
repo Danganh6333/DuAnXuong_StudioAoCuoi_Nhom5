@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const App = () => {
+const QuanLyCongViec = () => {
   return (
     <View>
-      <Text>App</Text>
+      <Text>QuanLyCongViec</Text>
     </View>
   )
 }
 
-export default App
+export default QuanLyCongViec
 
 const styles = StyleSheet.create({})
