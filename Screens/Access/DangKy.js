@@ -41,12 +41,16 @@ const DangKy = () => {
       Alert.alert('Không được để trống trường dữ liệu');
       return;
     }
+    if (!username.trim().length < 5 ) {
+      Alert.alert('Tên người dùng phải dài hơn 5 chữ');
+      return;
+    }
     if (password !== confirm) {
       Alert.alert('Trường dữ liệu mật khẩu phải bằng nhau');
       return;
     }
-    if(!isEmail(email)){
-      Alert.alert("Email sai định dạng");
+    if (!isEmail(email)) {
+      Alert.alert('Email sai định dạng');
       return;
     }
     const emailExists = await checkEmailExists(email);
@@ -120,9 +124,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    fontFamily: 'Rubik-VariableFont_wght',
+    fontFamily: 'Urbanist-Italic-VariableFont_wght',
     fontWeight: '700',
-    color: '#1e232c',
+    color: '#1E232C',
     fontSize: 31,
   },
   inputGroup: {
@@ -142,6 +146,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: 'Urbanist-VariableFont_wght',
   },
   image: {
     width: 23,
