@@ -28,7 +28,7 @@ const ThayDoiMatKhau = () => {
           style={styles.image}
         />
       </TouchableOpacity>
-      <Text style={styles.text}>Hello! Register to get{'\n'}started</Text>
+      <Text style={styles.text}>Create new password</Text>
       <View style={styles.inputGroup}>
         <SignIn_TextInput
           placeholder="Username"
