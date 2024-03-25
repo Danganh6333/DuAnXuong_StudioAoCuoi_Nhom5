@@ -18,7 +18,7 @@ const QuanLyNhanVien = () => {
         <Text style={{ marginLeft: 10, color: 'black', fontWeight: 'bold', fontSize: 20 }}> Nhân Viên</Text>
       </View> */}
       {/* box2 */}
-      <View style={{ flex: 0.9 }}>
+      <View style={{ flex: 1 }}>
         <ScrollView>
           <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
           </View>
