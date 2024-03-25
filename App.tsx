@@ -26,15 +26,15 @@ const Drawer = () => {
   const Drawer = createDrawerNavigator();
   return (
     <Drawer.Navigator>
-      <Drawer.Screen name="TrangChu" component={TrangChu} />
-      <Drawer.Screen name="QuanLyCongViec" component={QuanLyCongViec} />
+      <Drawer.Screen name="Trang Chủ" component={TrangChu} />
+      <Drawer.Screen name="Quản Lý Công Việc" component={QuanLyCongViec} />
       <Drawer.Screen
-        name="QuanLyDanhSachDichVu"
+        name="Quản Lý Danh Sách Dịch Vụ"
         component={QuanLyDanhSachDichVu}
       />
-      <Drawer.Screen name="QuanLyHoaDon" component={QuanLyHoaDon} />
-      <Drawer.Screen name="QuanLyNhanVien" component={QuanLyNhanVien} />
-      <Drawer.Screen name="QuanLyThongKe" component={QuanLyThongKe} />
+      <Drawer.Screen name="Quản Lý Hóa Đơn" component={QuanLyHoaDon} />
+      <Drawer.Screen name="Quản Lý Nhân Viên" component={QuanLyNhanVien} />
+      <Drawer.Screen name="Quản Lý Thống Kê" component={QuanLyThongKe} />
     </Drawer.Navigator>
   );
 };
@@ -43,25 +43,27 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
+      <Stack.Screen name="DangNhap" component={DangNhap} />
+      <Stack.Screen
+        name="Drawer"
+        component={Drawer}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Đăng Ký"
+        component={DangKy}
+        options={{headerShown: false}}
+      />
+
       <Stack.Screen
         name="ThayDoiMatKhau"
         component={ThayDoiMatKhau}
         options={{headerShown: false}}
       />
-      <Stack.Screen
-        name="DangKy"
-        component={DangKy}
-        options={{headerShown: false}}
-      />
+
       <Stack.Screen
         name="ManHinhChao"
         component={ManHinhChao}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen name="DangNhap" component={DangNhap} />
-      <Stack.Screen
-        name="Drawer"
-        component={Drawer}
         options={{headerShown: false}}
       />
 
