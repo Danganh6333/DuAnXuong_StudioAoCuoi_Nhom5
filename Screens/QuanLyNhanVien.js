@@ -11,12 +11,12 @@ const QuanLyNhanVien = () => {
   return (
     <View style={{ backgroundColor: 'red', flex: 1 }}>
       {/* box1 */}
-      <View style={{ backgroundColor: '#fff555', flex: 0.1, alignItems: 'center', flexDirection: 'row', paddingLeft: '5%' }}>
+      {/* <View style={{ backgroundColor: '#fff555', flex: 0.1, alignItems: 'center', flexDirection: 'row', paddingLeft: '5%' }}>
         <View style={{ backgroundColor: '#fff', width: 40, height: 40, borderRadius: 15, justifyContent: 'center', alignItems: 'center' }}>
           <Image style={{ width: 25, height: 25 }} source={require('../img/left.png')} />
         </View>
         <Text style={{ marginLeft: 10, color: 'black', fontWeight: 'bold', fontSize: 20 }}> Nhân Viên</Text>
-      </View>
+      </View> */}
       {/* box2 */}
       <View style={{ flex: 0.9 }}>
         <ScrollView>
