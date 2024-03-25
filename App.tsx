@@ -43,18 +43,19 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Drawer"
-        component={Drawer}
-        options={{headerShown: false}}
-      />
+      <Stack.Screen name="DangKy" component={DangKy} options={{headerShown:false}} />
       <Stack.Screen
         name="ManHinhChao"
         component={ManHinhChao}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
-      <Stack.Screen name="DangKy" component={DangKy} />
+      <Stack.Screen
+        name="Drawer"
+        component={Drawer}
+        options={{headerShown: false}}
+      />
+
       <Stack.Screen name="ThayDoiMatKhau" component={ThayDoiMatKhau} />
       <Stack.Screen name="TrangChu" component={TrangChu} />
       <Stack.Screen name="QuanLyCongViec" component={QuanLyCongViec} />
