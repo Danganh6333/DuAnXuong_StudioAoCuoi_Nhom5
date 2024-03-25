@@ -41,7 +41,7 @@ const DangKy = () => {
       Alert.alert('Không được để trống trường dữ liệu');
       return;
     }
-    if (!username.trim().length < 5 ) {
+    if (!username.trim().length > 5 ) {
       Alert.alert('Tên người dùng phải dài hơn 5 chữ');
       return;
     }
