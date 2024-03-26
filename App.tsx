@@ -1,9 +1,9 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import ManHinhChao from './Screens/ManHinhChao';
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import {DrawerItem, createDrawerNavigator} from '@react-navigation/drawer';
 import DangNhap from './Screens/Access/DangNhap';
 import DangKy from './Screens/Access/DangKy';
 import ThayDoiMatKhau from './Screens/Access/ThayDoiMatKhau';
@@ -13,6 +13,7 @@ import TrangChu from './Screens/TrangChu';
 import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const App = () => {
   return (
@@ -24,10 +25,23 @@ const App = () => {
 
 const Drawer = () => {
   const Drawer = createDrawerNavigator();
+  const navigation = useNavigation();
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Trang Chủ" component={TrangChu} />
-      <Drawer.Screen name="Quản Lý Công Việc" component={QuanLyCongViec} />
+    <Drawer.Navigator
+      screenOptions={{
+        headerTitleAlign: 'center',
+      }}>
+      <Drawer.Screen
+        name="Trang Chủ"
+        component={TrangChu}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <Icon name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen name="Quản Lý Công Việc" component={QuanLyCongViec}
+       />
       <Drawer.Screen
         name="Quản Lý Danh Sách Dịch Vụ"
         component={QuanLyDanhSachDichVu}
@@ -35,6 +49,15 @@ const Drawer = () => {
       <Drawer.Screen name="Quản Lý Hóa Đơn" component={QuanLyHoaDon} />
       <Drawer.Screen name="Quản Lý Nhân Viên" component={QuanLyNhanVien} />
       <Drawer.Screen name="Quản Lý Thống Kê" component={QuanLyThongKe} />
+      {/* <DrawerItem
+        label="Đăng Xuất"
+        icon={({color, size}) => (
+          <Icon name="log-out" size={size} color={color} />
+        )}
+        onPress={() => {
+          
+        }}
+      /> */}
     </Drawer.Navigator>
   );
 };
@@ -43,7 +66,7 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-       <Stack.Screen
+      <Stack.Screen
         name="DangKy"
         component={DangKy}
         options={{headerShown: false}}
@@ -54,7 +77,6 @@ const Stack = () => {
         component={Drawer}
         options={{headerShown: false}}
       />
-     
 
       <Stack.Screen
         name="ThayDoiMatKhau"
