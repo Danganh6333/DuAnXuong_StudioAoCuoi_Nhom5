@@ -22,7 +22,7 @@ const DangKy = () => {
   const checkEmailExists = async email => {
     try {
       const response = await axios.get(
-        `http://192.168.1.139:3000/nguoidungs/check/${email}`,
+        `http://192.168.2.106:3000/nguoidungs/check/${email}`,
       );
       return response.data.exists;
     } catch (error) {
@@ -59,7 +59,7 @@ const DangKy = () => {
     } else {
       try {
         const response = await axios.post(
-          'http://192.168.1.139:3000/nguoidungs/reg',
+          'http://192.168.2.106:3000/nguoidungs/reg',
           {
             username,
             password,

@@ -9,13 +9,12 @@ const QuanLyNhanVien = () => {
   const [nhanVien_id, setNhanVien_id] = useState({});
   const [modalVisible_ctnv, setModalVisible_ctnv] = useState(false);
   const [modalVisible_editnv, setModalVisible_editnv] = useState(false);
-  const [modalVisible_addnv, setModalVisible_addnv] = useState(false);
   const [_id, set_id] = useState('')
   const [hoTen, setHoTen] = useState('')
   const [email, setEmail] = useState('');
-  const [tenNguoiDung, setTenNguoiDung] = useState('nhanvien01');
-  const [matKhau, setMatKhau] = useState('nhanvien01');
-   const [diaChi, setDiaChi] = useState('');
+  //const [tenNguoiDung, setTenNguoiDung] = useState(nhanVien_id.tenNguoiDung);
+  // const [matKhau, setMatKhau] = useState('nhanvien01');
+   const [diaChi, setDiaChi] = useState('nhanvien01');
   const [dienThoai, setDienThoai] = useState('');
   const [ghiChu, setGhiChu] = useState('');
   const getList_nv = async () => {
@@ -31,62 +30,19 @@ const QuanLyNhanVien = () => {
   }, []);
 
   const putList_nv = async () => {
-    let id = _id; // Use the stored ID for the update request
-
-    if (!id || !hoTen || !email || !diaChi || !dienThoai) {
-      Alert.alert('Lỗi!', 'Vui lòng nhập đầy đủ thông tin nhân viên cần sửa!');
-      return; // Prevent update if required fields are empty
-    }
-
-    const obj = { hoTen, email, diaChi, dienThoai, ghiChu };
-
+     var id = _id
+     var obj = { hoTen, email, diaChi, dienThoai, ghiChu };
+  
     try {
-      await axios.put(`http://192.168.2.102:3000/nhanviens/updateNhanVien/${id}`, obj);
-      getList_nv(); // Refetch employee list after successful update
-      setModalVisible_editnv(false); // Close edit modal
+      await axios.put(`http://192.168.2.102:3000/nhanviens/updateNhanVien/${id}`, obj); 
+      getList_nv();
     } catch (error) {
       console.error(error);
-      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi sửa nhân viên!'); // Inform user about update error
     }
   };
-  const postList_nv = async () => {
-    if ( !hoTen || !email || !diaChi || !dienThoai) {
-      Alert.alert('Lỗi!', 'Vui lòng nhập đầy đủ thông tin nhân viên cần sửa!');
-      return; // Prevent update if required fields are empty
-    }
-    const obj = { hoTen,tenNguoiDung ,matKhau,email, diaChi, dienThoai, ghiChu };
-
-    try {
-      await axios.post('http://192.168.2.102:3000/nhanviens/addNhanVien', obj);
-      getList_nv(); // Refetch employee list after successful update
-      setModalVisible_addnv(false); // Close edit modal
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi thêm nhân viên!'); // Inform user about update error
-    }
-  };
-
-
 
   
   const renderItem = ({ item }) => {
-    const deleList_nv = async () => {
-      let id = item._id; // Sử dụng ID đã lưu để thực hiện yêu cầu xóa
-      if (!id) {
-          Alert.alert('Lỗi!', 'Vui lòng chọn nhân viên cần xóa!');
-          return; // Ngăn chặn việc xóa nếu không có ID được cung cấp
-      }
-      try {
-          const response = await axios.delete('http://192.168.2.102:3000/nhanviens/deleteNhanVien/'+id);
-          response.data.success
-              Alert.alert('Thành công!', 'Nhân viên đã được xóa!');
-              getList_nv(); // Lấy lại danh sách nhân viên sau khi xóa thành công
-  
-      } catch (error) {
-          console.error(error);
-          Alert.alert('Lỗi!', 'Có lỗi xảy ra khi xóa nhân viên!');
-      }
-  };
     return (
       <Pressable onPress={() => {
             setModalVisible_ctnv(true);
@@ -103,7 +59,8 @@ const QuanLyNhanVien = () => {
           <View style={{ flexDirection: 'row', }}>
           <Pressable onPress={() => {
             setModalVisible_editnv(true)
-            set_id(item._id)
+        //  setNhanVien_id(item);
+        set_id(item._id)
             setHoTen(item.hoTen);
             setEmail(item.email)
             setDiaChi(item.diaChi)
@@ -112,11 +69,8 @@ const QuanLyNhanVien = () => {
       }}>
           <Image style={{ width: 35, height: 35 }} source={require('../img/edit.png')} />
       </Pressable>
-      <Pressable onPress={() => deleList_nv()}>
-  <Image style={{ width: 35, height: 35 }} source={require('../img/trash.png')} />
-</Pressable>
-
-           </View>
+            <Image style={{ width: 35, height: 35 }} source={require('../img/trash.png')} />
+          </View>
         </View>
         <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
         </View>
@@ -140,13 +94,10 @@ const QuanLyNhanVien = () => {
       </View>
 
       {/* Box 3 (Add employee button) */}
-      <Pressable onPress={()=> setModalVisible_addnv(true)}>
-        <View style={{ position: 'absolute', bottom: 5, right: 5 }}>
+      <View style={{ position: 'absolute', bottom: 5, right: 5 }}>
         <Image style={{ width: 40, height: 40 }} source={require('../img/add.png')} />
       </View>
-      </Pressable>
-      
- {/* Modal chi tiết */}
+ {/* Box 4 () */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -180,7 +131,6 @@ const QuanLyNhanVien = () => {
 </View>
        </View>
       </Modal>
-      {/* Modal sửa */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -196,22 +146,22 @@ const QuanLyNhanVien = () => {
             <CustomTextInput
             placeholder="Email"
             value={email}
-            onChangeText={(txt)=> setEmail(txt)}
+            onChangeText={(txt)=> setHoTen(txt)}
           />
             <CustomTextInput
-            placeholder="Tên địa chỉ"
+            placeholder="Tên Đăng Nhập"
             value={diaChi}
-            onChangeText={(txt)=> setDiaChi(txt)}
+            onChangeText={(txt)=> setHoTen(txt)}
           />
             <CustomTextInput
-            placeholder="Số điện thoại"
+            placeholder="Tên Đăng Nhập"
             value={dienThoai}
-            onChangeText={(txt)=> setDienThoai(txt)}
+            onChangeText={(txt)=> setHoTen(txt)}
           />
             <CustomTextInput
-            placeholder="Ghi chú"
+            placeholder="Tên Đăng Nhập"
             value={ghiChu}
-            onChangeText={(txt)=> setGhiChu(txt)}
+            onChangeText={(txt)=> setHoTen(txt)}
           />
 </View>
       
@@ -221,48 +171,6 @@ const QuanLyNhanVien = () => {
   <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
 </Pressable>
 <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={putList_nv}>
-
-<Text style={{ color: 'black', textAlign: 'center' }}>Sửa</Text>
-</Pressable>
-</View>
-       </View>
-      </Modal>
-      {/* Modal thêm */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible_addnv}>
-       <View style={{flex:1,margin:'15%',borderRadius:30,  backgroundColor: '#fff666' }}>
-<View style={{padding:'8%'}}>
-<Text style={{ fontSize: 22, color: 'black', fontWeight: 'bold', textAlign: 'center' }}>Sửa nhân viên</Text>
-   <CustomTextInput
-            placeholder="Tên nhân viên"
-            onChangeText={(txt)=> setHoTen(txt)}
-          />
-            <CustomTextInput
-            placeholder="Email"
-            onChangeText={(txt)=> setEmail(txt)}
-          />
-            <CustomTextInput
-            placeholder="Tên địa chỉ"
-            onChangeText={(txt)=> setDiaChi(txt)}
-          />
-            <CustomTextInput
-            placeholder="Số điện thoại"
-            onChangeText={(txt)=> setDienThoai(txt)}
-          />
-            <CustomTextInput
-            placeholder="Ghi chú"
-            onChangeText={(txt)=> setGhiChu(txt)}
-          />
-</View>
-      
-<View style={{flexDirection:'row', width: '100%', justifyContent: 'space-around', alignItems: 'center', }}>
-<Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={() => setModalVisible_addnv(false)}>
-
-  <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
-</Pressable>
-<Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={postList_nv}>
 
 <Text style={{ color: 'black', textAlign: 'center' }}>Sửa</Text>
 </Pressable>
