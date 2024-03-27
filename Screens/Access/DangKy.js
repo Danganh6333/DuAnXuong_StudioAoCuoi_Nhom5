@@ -68,7 +68,7 @@ const DangKy = () => {
           },
         );
         console.log('Signup successful:', response.data);
-        navigate.navigate('DangNhap');
+        navigate.navigate('Drawer');
       } catch (error) {
         console.error('Signup failed:', error);
         Alert.alert('Signup failed. Please try again.');
