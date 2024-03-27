@@ -4,7 +4,7 @@ import React from 'react'
 const TrangChu = () => {
   return (
     <View>
-      <Text>TrangChu</Text>
+      <Text>Chào Mừng</Text>
     </View>
   )
 }
