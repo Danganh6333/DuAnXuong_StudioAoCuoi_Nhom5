@@ -18,7 +18,7 @@ const DangNhap = () => {
       return;
     }
     try {
-      const response = await axios.post('http://192.168.1.139:3000/nguoidungs/login', {
+      const response = await axios.post('http://192.168.1.249:3000/nguoidungs/login', {
         username: tendangnhap,
         password: password
       });

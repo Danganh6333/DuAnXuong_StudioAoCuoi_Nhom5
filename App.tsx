@@ -13,6 +13,7 @@ import TrangChu from './Screens/TrangChu';
 import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
+import QuanLyKhachHang from './Screens/QuanLyKhachHang';
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const Drawer = () => {
       />
       <Drawer.Screen name="Quản Lý Hóa Đơn" component={QuanLyHoaDon} />
       <Drawer.Screen name="Quản Lý Nhân Viên" component={QuanLyNhanVien} />
+      <Drawer.Screen name="Quản Lý Khách Hàng" component={QuanLyKhachHang} />
       <Drawer.Screen name="Quản Lý Thống Kê" component={QuanLyThongKe} />
     </Drawer.Navigator>
   );
