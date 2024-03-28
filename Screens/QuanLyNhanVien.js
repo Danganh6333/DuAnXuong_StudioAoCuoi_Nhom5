@@ -115,13 +115,9 @@ const QuanLyNhanVien = () => {
       Alert.alert('Lỗi!', 'Có lỗi xảy ra khi xóa nhân viên!');
     }
   };
-  
-  
-
   const renderItem = ({ item }) => {
 
     return (
-
       <Pressable onPress={() => {
         setModalVisible_ctnv(true);
         setNhanVien_id(item);
@@ -152,7 +148,7 @@ const QuanLyNhanVien = () => {
              }     }>
               <Image style={{ width: 35, height: 35, tintColor: 'red' }} source={require('../img/trash.png')} />
             </Pressable>
-
+            
           </View>
         </View>
         <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
