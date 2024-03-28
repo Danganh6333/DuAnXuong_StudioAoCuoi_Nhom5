@@ -39,7 +39,7 @@ const Item = ({item, toggleUpdateDialog, toggleDeleteDialog}) => (
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => toggleUpdateDialog(item._id)}>
+          onPress={() => toggleUpdateDialog(item)}>
           <AntDesign name="form" style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -52,7 +52,6 @@ const QuanLyDanhSachDichVu = () => {
   const [loading, setLoading] = useState(true);
   const [acesnding, setacesnding] = useState('');
   const [isExtended, setIsExtended] = React.useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -129,23 +128,22 @@ const QuanLyDanhSachDichVu = () => {
       .then(res => {
         if (res.ok) {
           Alert.alert('Thêm thành công');
-          getDanhSachDichVu()
+          getDanhSachDichVu();
         }
       })
       .catch(err => {
         console.log('Lỗi Thêm Nhân Viên', err);
       });
   };
-  const updateProduct = () => {
+  const CapNhatDichVu = () => {
     const updatedItem = {
-      id: selectedItem.id,
-      name: updatedName,
-      gender: updatedGender,
-      contract: updatedContract,
-      image: selectedItem.image,
+      tenDichVu: updateTenDichVu,
+      trangThai: updateTrangThai,
+      moTa: updateMoTa,
+      giaTien: updateGiaTien,
     };
 
-    fetch(`http://192.168.1.9:3000/employees/${selectedItem.id}`, {
+    fetch(`http://${COMMON.ipv4}:3000/employees/${selectedItem.id}`, {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
@@ -167,12 +165,20 @@ const QuanLyDanhSachDichVu = () => {
     setShowAddDialog(value);
   };
 
-  const toggleUpdateDialog = value => {
-    setShowUpdateDialog(value);
+  const toggleUpdateDialog = item => {
+    setShowUpdateDialog(true);
+    setUpdateTenDichVu(item.tenDichVu);
+    setUpdateTrangThai(item.trangThai);
+    setUpdateMoTa(item.moTa);
+    setUpdateGiaTien(item.giaTien);
   };
-  const toggleDeleteDialog = itemId => {
-    setSelectedItemId(itemId);
+  const toggleDeleteDialog = item => {
+    setSelectedItemId(item);
     setShowDeleteDialog(true);
+    setUpdateTenDichVu(item.tenDichVu);
+    setUpdateTrangThai(item.trangThai);
+    setUpdateMoTa(item.moTa);
+    setUpdateGiaTien(item.giaTien);
   };
 
   const fabStyle = {right: 16, bottom: 16};
@@ -193,6 +199,12 @@ const QuanLyDanhSachDichVu = () => {
               toggleAddDialog={toggleAddDialog}
               toggleUpdateDialog={toggleUpdateDialog}
               toggleDeleteDialog={toggleDeleteDialog}
+              updateTenDichVu={updateTenDichVu}
+              setUpdateTenDichVu={setUpdateTenDichVu}
+              updateMoTa={updateMoTa}
+              setUpdateMoTa={setUpdateMoTa}
+              updateGiaTien={updateGiaTien}
+              setUpdateGiaTien={setUpdateGiaTien}
             />
           )}
           keyExtractor={item => item._id}
@@ -211,6 +223,48 @@ const QuanLyDanhSachDichVu = () => {
         labelStyle={styles.fabLabel}
         contentStyle={styles.fabContent}
       />
+      <Modal visible={showUpdateDialog} transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Sửa Dịch Vụ</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Tên Dịch Vụ"
+              value={updateTenDichVu}
+              onChangeText={txt => setUpdateTenDichVu(txt)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Mô Tả"
+              value={updateMoTa}
+              onChangeText={txt => setUpdateMoTa(txt)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Giá Tiền"
+              value={updateGiaTien}
+              onChangeText={txt => setUpdateGiaTien(txt)}
+              keyboardType="numeric"
+            />
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Trạng Thái</Text>
+              <Switch
+                trackColor={{false: '#767577', true: '#81b0ff'}}
+                thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                value={updateTrangThai}
+                onValueChange={value => {
+                  setIsEnabled(value);
+                  setUpdateTrangThai(value ? 1 : 0);
+                }}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button title="Đóng" onPress={() => setShowUpdateDialog(false)} />
+              <Button title="Thêm" onPress={ThemDichVu} />
+            </View>
+          </View>
+        </View>
+      </Modal>
       <Modal visible={showAddDialog} transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -236,8 +290,8 @@ const QuanLyDanhSachDichVu = () => {
               <Switch
                 trackColor={{false: '#767577', true: '#81b0ff'}}
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                value={isEnabled}
-                onValueChange={(value) => {
+                value={updateTrangThai}
+                onValueChange={value => {
                   setIsEnabled(value);
                   setTrangThai(value ? 1 : 0);
                 }}
@@ -247,19 +301,6 @@ const QuanLyDanhSachDichVu = () => {
               <Button title="Đóng" onPress={() => setShowAddDialog(false)} />
               <Button title="Thêm" onPress={ThemDichVu} />
             </View>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={showUpdateDialog} transparent={true}>
-        <View style={styles.khungDialog}>
-          <View style={styles.dialog}>
-            <Text>Đây là Dialog mở đầu</Text>
-
-            <Button
-              title="Đóng dialog"
-              onPress={() => setShowUpdateDialog(false)}
-            />
           </View>
         </View>
       </Modal>
@@ -447,7 +488,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginTop: 20,
   },
 });
