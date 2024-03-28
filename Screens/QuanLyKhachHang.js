@@ -1,25 +1,35 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, Pressable, Alert, Modal, Button, TextInput } from 'react-native';
-
-const mockCustomers = [
-  // Giả định dữ liệu khách hàng mẫu
-  {
-    id: '1',
-    hoTen: 'Khách hàng 1',
-    email: 'kh1@gmail.com',
-    sdt: '0123456789',
-    diaChi: '123 Đường ABC, Quận 1, TP.HCM',
-    lichSuMuaHang: 'Mua 2 sản phẩm ngày 01/01/2024',
-    thongTinThanhToan: 'Thanh toán qua thẻ ngân hàng',
-  },
-  // Thêm dữ liệu khách hàng mẫu ở đây
-];
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, Pressable, FlatList, Alert, TextInput, Button, Modal } from 'react-native';
+import axios from 'axios';
+import COMMON from '../COMMON';
 
 const QuanLyKhachHang = () => {
+  const [khachHangs, setKhachHangs] = useState([]);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showAddOrUpdateModal, setShowAddOrUpdateModal] = useState(false);
   const [isUpdateAction, setIsUpdateAction] = useState(false);
-  const [currentCustomer, setCurrentCustomer] = useState(null);
+  const [currentCustomer, setCurrentCustomer] = useState({
+    id: '',
+    hoTen: '',
+    email: '',
+    sdt: '',
+    diaChi: '',
+    lichSuMuaHang: [],
+    thongTinThanhToan: '',
+  });
+
+  useEffect(() => {
+    fetchKhachHangs();
+  }, []);
+
+  const fetchKhachHangs = async () => {
+    try {
+      const response = await axios.get(`http://${COMMON.ipv4}:3000/khachhangs/getKhachHang`);
+      setKhachHangs(response.data);
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể lấy dữ liệu khách hàng: ' + error.message);
+    }
+  };
 
   const handleOpenDetailsModal = (customer) => {
     setCurrentCustomer(customer);
@@ -27,74 +37,118 @@ const QuanLyKhachHang = () => {
   };
 
   const handleOpenAddOrUpdateModal = (customer = null) => {
-    setCurrentCustomer(customer);
-    setIsUpdateAction(customer !== null);
+    setCurrentCustomer(customer || {
+      id: '',
+      hoTen: '',
+      email: '',
+      sdt: '',
+      diaChi: '',
+      lichSuMuaHang: [],
+      thongTinThanhToan: '',
+    });
+    setIsUpdateAction(!!customer);
     setShowAddOrUpdateModal(true);
   };
 
   const handleCloseModal = () => {
     setShowDetailsModal(false);
     setShowAddOrUpdateModal(false);
-    setCurrentCustomer(null);
+    setCurrentCustomer({
+      id: '',
+      hoTen: '',
+      email: '',
+      sdt: '',
+      diaChi: '',
+      lichSuMuaHang: [],
+      thongTinThanhToan: '',
+    });
   };
 
-  const handleDeleteCustomer = (customerId) => {
+  const saveCustomer = async () => {
+    if (!currentCustomer.hoTen || !currentCustomer.email || !currentCustomer.sdt || !currentCustomer.diaChi) {
+      Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+
+    const method = isUpdateAction ? 'put' : 'post';
+    const url = isUpdateAction ? `http://${COMMON.ipv4}:3000/khachhangs/updateKhachHang/${currentCustomer._id}` : `http://${COMMON.ipv4}:3000/khachhangs/addKhachHang`;
+
+    try {
+      await axios[method](url, currentCustomer);
+      const successMessage = isUpdateAction ? "Cập nhật khách hàng thành công!" : "Thêm khách hàng thành công!";
+      Alert.alert("Thành công", successMessage);
+      fetchKhachHangs(); // Làm mới danh sách
+    } catch (error) {
+      const errorMessage = isUpdateAction ? "Cập nhật khách hàng không thành công: " : "Thêm khách hàng mới không thành công: ";
+      Alert.alert("Lỗi", errorMessage + error.message);
+    } finally {
+      handleCloseModal();
+    }
+  };
+
+  const handleDeleteCustomer = async (customerId) => {
+    console.log("Attempting to delete customer with ID:", customerId); 
     Alert.alert("Xác nhận", "Bạn có muốn xóa khách hàng này?", [
       { text: "Không", style: "cancel" },
-      { text: "Có", onPress: () => console.log("Đã xóa", customerId) },
+      {
+        text: "Có", onPress: async () => {
+          try {
+            const response = await axios.delete(`http://${COMMON.ipv4}:3000/khachhangs/deleteKhachHang/${customerId}`);
+            console.log("Delete response:", response);
+            Alert.alert("Thông báo", "Khách hàng đã được xóa.");
+            fetchKhachHangs(); // Làm mới danh sách sau khi
+          } catch (error) {
+            console.log("Error deleting customer:", error);
+            Alert.alert("Lỗi", "Không thể xóa khách hàng: " + error.message);
+          }
+        }
+      },
     ]);
   };
 
-  // Hàm lưu thay đổi (Thêm mới hoặc Cập nhật)
-  const saveCustomer = () => {
-    if (isUpdateAction) {
-      console.log("Cập nhật khách hàng", currentCustomer);
-    } else {
-      console.log("Thêm mới khách hàng", currentCustomer);
-    }
-    handleCloseModal();
-  };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {mockCustomers.map((customer, index) => (
-          <Pressable key={index} onPress={() => handleOpenDetailsModal(customer)}>
+      <FlatList
+        data={khachHangs}
+        keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
+
+        renderItem={({ item }) => (
+
+          <Pressable onPress={() => handleOpenDetailsModal(item)}>
             <View style={styles.customerItem}>
-            <Image style={styles.userIcon} source={require('../img/user.png')} />
+              <Image style={styles.userIcon} source={require('../img/user.png')} />
               <View>
-                <Text style={styles.customerText}>{customer.hoTen}</Text>
-                <Text style={styles.customerText}>{customer.email}</Text>
+                <Text style={styles.customerText}>{item.hoTen}</Text>
+                <Text style={styles.customerText}>{item.email}</Text>
               </View>
-              
+
               <View style={styles.iconsContainer}>
-                <Pressable onPress={() => handleOpenAddOrUpdateModal(customer)}>
+                <Pressable onPress={() => handleOpenAddOrUpdateModal(item)}>
                   <Image style={styles.icon} source={require('../img/edit.png')} />
                 </Pressable>
-                <Pressable onPress={() => handleDeleteCustomer(customer.id)}>
+                <Pressable onPress={() => handleDeleteCustomer(item._id)}>
                   <Image style={styles.icon} source={require('../img/trash.png')} />
                 </Pressable>
               </View>
             </View>
           </Pressable>
-        ))}
-      </ScrollView>
+        )}
+      />
 
       <Pressable style={styles.addButton} onPress={() => handleOpenAddOrUpdateModal()}>
         <Image style={styles.icon} source={require('../img/add.png')} />
       </Pressable>
-      
+
       {/* Modal Chi Tiết */}
       <Modal visible={showDetailsModal} animationType="slide" transparent={true}>
         <View style={styles.modalView}>
-          {/* Hiển thị thông tin chi tiết của khách hàng */}
-          <Text style={styles.modalText}>Họ tên: {currentCustomer?.hoTen}</Text>
-          <Text style={styles.modalText}>Email: {currentCustomer?.email}</Text>
-          <Text style={styles.modalText}>SĐT: {currentCustomer?.sdt}</Text>
-          <Text style={styles.modalText}>Địa Chỉ: {currentCustomer?.diaChi}</Text>
-          <Text style={styles.modalText}>Lịch sử: {currentCustomer?.lichSuMuaHang}</Text>
-          <Text style={styles.modalText}>Thông Tin: {currentCustomer?.thongTinThanhToan}</Text>
-          {/* Hiển thị các thông tin khác */}
+          <Text style={styles.modalText}>Họ tên: {currentCustomer.hoTen}</Text>
+          <Text style={styles.modalText}>Email: {currentCustomer.email}</Text>
+          <Text style={styles.modalText}>SĐT: {currentCustomer.sdt}</Text>
+          <Text style={styles.modalText}>Địa Chỉ: {currentCustomer.diaChi}</Text>
+          <Text style={styles.modalText}>Lịch sử: {currentCustomer.lichSuMuaHang}</Text>
+          <Text style={styles.modalText}>Thông Tin: {currentCustomer.thongTinThanhToan}</Text>
           <Button title="Đóng" onPress={handleCloseModal} />
         </View>
       </Modal>
@@ -102,45 +156,47 @@ const QuanLyKhachHang = () => {
       {/* Modal Thêm Mới / Cập Nhật */}
       <Modal visible={showAddOrUpdateModal} animationType="slide" transparent={true}>
         <View style={styles.modalView}>
-                    {/* Form nhập liệu cho việc thêm mới hoặc cập nhật */}
-                    <Text style={styles.modalTitle}>{isUpdateAction ? 'Cập nhật Khách Hàng' : 'Thêm Khách Hàng Mới'}</Text>
+          <Text style={styles.modalTitle}>{isUpdateAction ? 'Cập nhật Khách Hàng' : 'Thêm Khách Hàng Mới'}</Text>
+          {/* Form nhập liệu */}
           <TextInput
             style={styles.input}
             placeholder="Họ và tên"
-            value={currentCustomer?.hoTen}
+            value={currentCustomer.hoTen}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, hoTen: text })}
           />
           <TextInput
             style={styles.input}
             placeholder="Email"
-            value={currentCustomer?.email}
+            value={currentCustomer.email}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, email: text })}
           />
           <TextInput
             style={styles.input}
-            placeholder="SĐT"
-            value={currentCustomer?.sdt}
+            placeholder="SDT"
+            value={currentCustomer.sdt}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, sdt: text })}
           />
           <TextInput
             style={styles.input}
             placeholder="Địa Chỉ"
-            value={currentCustomer?.diaChi}
+            value={currentCustomer.diaChi}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, diaChi: text })}
           />
           <TextInput
             style={styles.input}
-            placeholder="Lịch Sử"
-            value={currentCustomer?.lichSuMuaHang}
-            onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, lichSuMuaHang: text })}
+            placeholder="Lịch Sử Mua Hàng"
+            value={Array.isArray(currentCustomer.lichSuMuaHang) ? currentCustomer.lichSuMuaHang.join(", ") : ''}// Nối mảng thành một chuỗi, cách nhau bởi dấu phẩy
+            onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, lichSuMuaHang: text.split(", ") })} // Khi thay đổi, chia chuỗi thành mảng lại nếu cần
           />
+
+
           <TextInput
             style={styles.input}
-            placeholder="Thông tin"
-            value={currentCustomer?.thongTinThanhToan}
+            placeholder="Thông Tin "
+            value={currentCustomer.thongTinThanhToan}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, thongTinThanhToan: text })}
           />
-          {/* Thêm các trường input khác tương tự ở đây */}
+          {/* Các TextInput khác tương tự */}
           <View style={styles.buttonsContainer}>
             <Button title="Hủy" onPress={handleCloseModal} />
             <Button title="Lưu" onPress={saveCustomer} />
@@ -150,6 +206,7 @@ const QuanLyKhachHang = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

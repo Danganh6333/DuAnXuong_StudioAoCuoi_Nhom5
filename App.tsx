@@ -14,6 +14,7 @@ import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
 import QuanLyKhachHang from './Screens/QuanLyKhachHang';
+import  Icon  from 'react-native-vector-icons/AntDesign';
 
 const App = () => {
   return (
@@ -69,7 +70,7 @@ const Stack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="DangKy"
-        component={QuanLyNhanVien}
+        component={DangKy}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
