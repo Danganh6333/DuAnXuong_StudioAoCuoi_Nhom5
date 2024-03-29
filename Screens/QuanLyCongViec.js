@@ -31,6 +31,7 @@ const [show, setShow] = useState(false);
 const [selectedEmployee, setSelectedEmployee] = useState(null);
 const [nhanVien, setNhanVien] = useState([]);
 const [idNhanVien, setIdNhanVien] = useState(selectedEmployee);
+const [employees, setEmployees] = useState([]);
 const EmployeePicker = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -43,9 +44,10 @@ const EmployeePicker = () => {
     fetchData();
   }, []);
 
-  const handleEmployeeChange = (value) => {
-    setSelectedEmployee(value);
-  };
+const handleEmployeeChange = (value) => {
+  setIdNhanVien(value); // Cập nhật idNhanVien trực tiếp
+  setSelectedEmployee(value);
+};
 
   return (
     <Picker
@@ -64,9 +66,30 @@ const getList_nv = async () => {
     const response = await axios.get('http://192.168.2.102:3000/nhanviens/getNhanVien');
     setNhanVien(response.data);
   } catch (error) {
-    console.error(error);
+    console.error('Lỗi khi lấy nhanVien:', error);
+    Alert.alert('Lỗi!', 'Có lỗi xảy ra khi lấy dữ liệu!');
   }
-};
+}; 
+const postList_cv = async () => {
+    if (!tenCongViec || !noiDungCongViec || !ngayKetThuc || !ngayBatDau) {
+      setModalVisible_Isempty(true);
+      return; // Prevent update if required fields are empty
+    }
+    const obj = {idNhanVien,ngayBatDau, trangThai ,tenCongViec, noiDungCongViec, ngayKetThuc  };
+    try {
+      await axios.post('http://192.168.2.102:3000/congviecs/addCongViec', obj);
+      getList_cv(); 
+      setTenCongViec('')
+      setTrangThai('')
+      setNoiDungCongViec('')
+      setNgayBatDau('')
+      setNgayKetThuc('')
+      setModalVisible_addcv(false); 
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi thêm nhân viên!'+error); // Inform user about update error
+    }
+  };
 const onChangeNgayBatDau = (event, selectedDate) => {
   const currentDate = selectedDate || date;
 
@@ -115,27 +138,9 @@ const showMode = (currentMode) => {
   };
   useEffect(() => {
     getList_cv()
+    getList_nv()
   }, []);
-  const postList_cv = async () => {
-    if (!tenCongViec || !noiDungCongViec || !ngayKetThuc || !ngayBatDau) {
-      setModalVisible_Isempty(true);
-      return; // Prevent update if required fields are empty
-    }
-    const obj = {idNhanVien,ngayBatDau, trangThai ,tenCongViec, noiDungCongViec, ngayKetThuc  };
-    try {
-      await axios.post('http://192.168.2.102:3000/congviecs/addCongViec', obj);
-      getList_cv(); 
-      setTenCongViec('')
-      setTrangThai('')
-      setNoiDungCongViec('')
-      setNgayBatDau('')
-      setNgayKetThuc('')
-      setModalVisible_addcv(false); 
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi thêm nhân viên!'+error); // Inform user about update error
-    }
-  };
+ 
   const putList_nv = async () => {
     let id = _id; // Use the stored ID for the update request
     if (!tenCongViec || !noiDungCongViec ) {
@@ -180,15 +185,21 @@ const showMode = (currentMode) => {
     }
   };
   const renderItem = ({ item }) => {
+  
+    const employee = nhanVien.find((nv) => nv._id === item.idNhanVien);
+  const tenNhanVien = employee ? employee.hoTen : 'Đang tải...';
     return (
       <Pressable onPress={() => {
         setModalVisible_ctcv(true)
         setCongViec_id(item);
+        setSelectedEmployee(tenNhanVien);
       }}>
       <View style={{ height: 5, backgroundColor: '#A1A1A1' }} />
       <View style={{ backgroundColor: '#fff', height: 80, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
         <View>
           <Text style={{ color: 'black' }}>{item.tenCongViec}</Text>
+          <Text style={{ color: 'black' }}>{item.idNhanVien}</Text>
+          <Text style={{ color: 'black' }}>{tenNhanVien}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Pressable onPress={() => {
@@ -403,8 +414,9 @@ const showMode = (currentMode) => {
             <Text style={{ fontSize: 22, color: 'black', fontWeight: 'bold', textAlign: 'center' }}>Chi tiết Công việc</Text>
             <Text style={{ marginTop: 15, fontSize: 19, color: 'black', fontWeight: 'bold', paddingLeft: '5%' }}>Tên công việc</Text>
             <Text style={{ fontSize: 16, color: 'black', fontWeight: '500', paddingLeft: '5%' }}>  {congViec_id.tenCongViec}</Text>
-
-            <Text style={{ marginTop: 15, fontSize: 19, color: 'black', fontWeight: 'bold', paddingLeft: '5%' }}>Ngày bắt đầu</Text>
+            <Text>
+      {selectedEmployee} </Text>
+ <Text style={{ marginTop: 15, fontSize: 19, color: 'black', fontWeight: 'bold', paddingLeft: '5%' }}>Ngày bắt đầu</Text>
             <Text style={{ fontSize: 16, color: 'black', fontWeight: '500', paddingLeft: '5%' }}>   {getFormattedDate(congViec_id.ngayBatDau)}</Text>
 
             <Text style={{ marginTop: 15, fontSize: 19, color: 'black', fontWeight: 'bold', paddingLeft: '5%' }}>Ngày kết thúc</Text>

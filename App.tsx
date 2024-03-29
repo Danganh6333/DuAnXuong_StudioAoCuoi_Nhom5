@@ -3,7 +3,6 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import ManHinhChao from './Screens/ManHinhChao';
-import {createDrawerNavigator} from '@react-navigation/drawer';
 import DangNhap from './Screens/Access/DangNhap';
 import DangKy from './Screens/Access/DangKy';
 import ThayDoiMatKhau from './Screens/Access/ThayDoiMatKhau';
@@ -13,6 +12,8 @@ import TrangChu from './Screens/TrangChu';
 import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
+import DrawerNavigation from './Components/DrawerNavigation';
+import QuanLyKhachHang from './Screens/QuanLyKhachHang';
 
 const App = () => {
   return (
@@ -22,39 +23,21 @@ const App = () => {
   );
 };
 
-const Drawer = () => {
-  const Drawer = createDrawerNavigator();
-  return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Trang Chủ" component={TrangChu} />
-      <Drawer.Screen name="Quản Lý Công Việc" component={QuanLyCongViec} />
-      <Drawer.Screen
-        name="Quản Lý Danh Sách Dịch Vụ"
-        component={QuanLyDanhSachDichVu}
-      />
-      <Drawer.Screen name="Quản Lý Hóa Đơn" component={QuanLyHoaDon} />
-      <Drawer.Screen name="Quản Lý Nhân Viên" component={QuanLyNhanVien} />
-      <Drawer.Screen name="Quản Lý Thống Kê" component={QuanLyThongKe} />
-    </Drawer.Navigator>
-  );
-};
-
 const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-       <Stack.Screen
+      <Stack.Screen
         name="DangKy"
-        component={DangNhap}
+        component={QuanLyCongViec}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
       <Stack.Screen
         name="Drawer"
-        component={Drawer}
+        component={DrawerNavigation}
         options={{headerShown: false}}
       />
-     
 
       <Stack.Screen
         name="ThayDoiMatKhau"
@@ -77,6 +60,7 @@ const Stack = () => {
       <Stack.Screen name="QuanLyHoaDon" component={QuanLyHoaDon} />
       <Stack.Screen name="QuanLyNhanVien" component={QuanLyNhanVien} />
       <Stack.Screen name="QuanLyThongKe" component={QuanLyThongKe} />
+      <Stack.Screen name="QuanLyKhachHang" component={QuanLyKhachHang} />
     </Stack.Navigator>
   );
 };
