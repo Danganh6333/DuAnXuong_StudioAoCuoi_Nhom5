@@ -7,7 +7,7 @@ import CustomTextInput from '../Components/CustomTextInput';
 import Button from '../Components/Button';
 import moment from 'moment';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import { Picker } from '@react-native-picker/picker';
 const QuanLyCongViec = () => {
   const [congViec, setCongViec] = useState([]);
   const [congViec_id, setCongViec_id] = useState({});
@@ -16,6 +16,7 @@ const QuanLyCongViec = () => {
   const [modalVisible_addcv, setModalVisible_addcv] = useState(false);
   const [modalVisible_delecv, setModalVisible_Delecv] = useState(false);
   const [modalVisible_isempty, setModalVisible_Isempty] = useState(false);
+  const [modalVisible_delecv2, setModalVisible_Delecv2] = useState(false);
   const [isSelected, setSelection] = useState(false);
   const [_id, set_id] = useState('')
   const [tenCongViec, setTenCongViec] = useState('');
@@ -27,8 +28,45 @@ const [trangThai, setTrangThai] = useState(0);
 const [date, setDate] = useState(new Date());
 const [mode, setMode] = useState('date');
 const [show, setShow] = useState(false);
+const [selectedEmployee, setSelectedEmployee] = useState(null);
+const [nhanVien, setNhanVien] = useState([]);
+const [idNhanVien, setIdNhanVien] = useState(selectedEmployee);
+const EmployeePicker = () => {
+  const [employees, setEmployees] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get('http://192.168.2.102:3000/nhanviens/getNhanVien');
+      setEmployees(response.data);
+    };
+    fetchData();
+  }, []);
 
+  const handleEmployeeChange = (value) => {
+    setSelectedEmployee(value);
+  };
+
+  return (
+    <Picker
+      selectedValue={selectedEmployee}
+      onValueChange={handleEmployeeChange}
+    >
+      <Picker.Item label="Chọn nhân viên" value={null} key="blank" />
+      {employees.map((employee) => (
+        <Picker.Item label={employee.hoTen} value={employee._id} key={employee._id} />
+      ))}
+    </Picker>
+  );
+};
+const getList_nv = async () => {
+  try {
+    const response = await axios.get('http://192.168.2.102:3000/nhanviens/getNhanVien');
+    setNhanVien(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
 const onChangeNgayBatDau = (event, selectedDate) => {
   const currentDate = selectedDate || date;
 
@@ -83,7 +121,7 @@ const showMode = (currentMode) => {
       setModalVisible_Isempty(true);
       return; // Prevent update if required fields are empty
     }
-    const obj = {ngayBatDau, trangThai ,tenCongViec, noiDungCongViec, ngayKetThuc  };
+    const obj = {idNhanVien,ngayBatDau, trangThai ,tenCongViec, noiDungCongViec, ngayKetThuc  };
     try {
       await axios.post('http://192.168.2.102:3000/congviecs/addCongViec', obj);
       getList_cv(); 
@@ -133,8 +171,9 @@ const showMode = (currentMode) => {
     try {
       const response = await axios.delete(`http://192.168.2.102:3000/congviecs/deleteCongViec/${id}`);
      response.data.success 
-       getList_cv();
-      setModalVisible_Delecv(false)
+     setModalVisible_Delecv(false)
+     getList_cv();
+      setModalVisible_Delecv2(true)
     } catch (error) {
       console.error(error);
       Alert.alert('Lỗi!', 'Có lỗi xảy ra khi xóa nhân viên!');
@@ -204,7 +243,7 @@ const showMode = (currentMode) => {
               placeholder="Tên công việc"
               onChangeText={(txt) => setTenCongViec(txt)}
             />
-     
+     <EmployeePicker/>
 <View style={{alignItems:'center',height:50,flexDirection:'row',justifyContent:'space-around'}}>
 <Pressable  onPress={() => showMode('date')}>
 <View style={{width:90,borderRadius:20,height:40,padding:'5%',justifyContent:'center',backgroundColor:'#BF9191'}}>
@@ -330,11 +369,13 @@ const showMode = (currentMode) => {
     height:100
               }}   />
           </View>
-          <View>
+          <View style={{flexDirection:'row',alignItems:'center',marginBottom:20}}>
           <CheckBox
+          style={{marginLeft:30}}
   value={trangThai === 1}
   onValueChange={(newTrangThai) => {
     setTrangThai(newTrangThai ? 1 : 0);
+   
   }}/>
              <Text style={{width:150, color: trangThai === 1 ? 'green' : 'red' }}>
             {congViec_id.trangThai === 1 ? 'Đã hoàn thành' : 'Đang hoàn thành'}
@@ -352,7 +393,7 @@ const showMode = (currentMode) => {
           </View>
         </View>
       </Modal>
-      {/* Modal Thêm */}
+      {/* Modal chi tiet */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -479,6 +520,51 @@ const showMode = (currentMode) => {
             <Pressable
               onPress={() => {
                 setModalVisible_Isempty(false)
+              }}
+              style={{
+                padding: 10,
+                width: 120,
+                height: 60,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 20,
+              }} >
+              <Text style={{ color: '#70cbff', fontSize: 15, fontWeight: 'bold' }}>
+                Đóng
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      {/* Modal thong bao */}
+      <Modal
+            animationType="slide"
+        transparent={true}
+        visible={modalVisible_delecv2}
+     
+        >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#0C0F14',
+              padding: 20,
+              borderRadius: 10,
+              alignItems: 'center',
+              width: '80%',
+            }}
+          >
+            <Text style={{ color: '#FFFFFF', marginBottom: 10 }}>
+            Xóa thành công
+            </Text>
+            <Pressable
+              onPress={() => {
+                setModalVisible_Delecv2(false)
               }}
               style={{
                 padding: 10,
