@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, Pressable, FlatList, Alert, TextInput, Button, Modal } from 'react-native';
 import axios from 'axios';
 import COMMON from '../COMMON';
+import CustomTextInput from '../Components/CustomTextInput';
 
 const QuanLyKhachHang = () => {
   const [khachHangs, setKhachHangs] = useState([]);
@@ -87,7 +88,7 @@ const QuanLyKhachHang = () => {
   };
 
   const handleDeleteCustomer = async (customerId) => {
-    console.log("Attempting to delete customer with ID:", customerId); 
+    console.log("Attempting to delete customer with ID:", customerId);
     Alert.alert("Xác nhận", "Bạn có muốn xóa khách hàng này?", [
       { text: "Không", style: "cancel" },
       {
@@ -149,7 +150,9 @@ const QuanLyKhachHang = () => {
           <Text style={styles.modalText}>Địa Chỉ: {currentCustomer.diaChi}</Text>
           <Text style={styles.modalText}>Lịch sử: {currentCustomer.lichSuMuaHang}</Text>
           <Text style={styles.modalText}>Thông Tin: {currentCustomer.thongTinThanhToan}</Text>
-          <Button title="Đóng" onPress={handleCloseModal} />
+          <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={handleCloseModal}>
+              <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
+            </Pressable>
         </View>
       </Modal>
 
@@ -158,31 +161,31 @@ const QuanLyKhachHang = () => {
         <View style={styles.modalView}>
           <Text style={styles.modalTitle}>{isUpdateAction ? 'Cập nhật Khách Hàng' : 'Thêm Khách Hàng Mới'}</Text>
           {/* Form nhập liệu */}
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="Họ và tên"
             value={currentCustomer.hoTen}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, hoTen: text })}
           />
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="Email"
             value={currentCustomer.email}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, email: text })}
           />
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="SDT"
             value={currentCustomer.sdt}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, sdt: text })}
           />
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="Địa Chỉ"
             value={currentCustomer.diaChi}
             onChangeText={(text) => setCurrentCustomer({ ...currentCustomer, diaChi: text })}
           />
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="Lịch Sử Mua Hàng"
             value={Array.isArray(currentCustomer.lichSuMuaHang) ? currentCustomer.lichSuMuaHang.join(", ") : ''}// Nối mảng thành một chuỗi, cách nhau bởi dấu phẩy
@@ -190,7 +193,7 @@ const QuanLyKhachHang = () => {
           />
 
 
-          <TextInput
+          <CustomTextInput
             style={styles.input}
             placeholder="Thông Tin "
             value={currentCustomer.thongTinThanhToan}
@@ -198,8 +201,12 @@ const QuanLyKhachHang = () => {
           />
           {/* Các TextInput khác tương tự */}
           <View style={styles.buttonsContainer}>
-            <Button title="Hủy" onPress={handleCloseModal} />
-            <Button title="Lưu" onPress={saveCustomer} />
+            <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={handleCloseModal}>
+              <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
+            </Pressable>
+            <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={saveCustomer}>
+              <Text style={{ color: 'black', textAlign: 'center' }}>Lưu</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>

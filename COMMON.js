@@ -1,4 +1,4 @@
-const ipv4 = "10.24.50.85";
+const ipv4 = "192.168.1.249";
 
 
 module.exports = {
