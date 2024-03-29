@@ -29,7 +29,7 @@ const Stack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="DangKy"
-        component={QuanLyHoaDon}
+        component={QuanLyCongViec}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
