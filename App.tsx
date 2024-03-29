@@ -13,6 +13,7 @@ import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
 import DrawerNavigation from './Components/DrawerNavigation';
+import QuanLyKhachHang from './Screens/QuanLyKhachHang';
 
 const App = () => {
   return (
@@ -28,7 +29,7 @@ const Stack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="DangKy"
-        component={QuanLyDanhSachDichVu}
+        component={DangKy}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
@@ -59,6 +60,7 @@ const Stack = () => {
       <Stack.Screen name="QuanLyHoaDon" component={QuanLyHoaDon} />
       <Stack.Screen name="QuanLyNhanVien" component={QuanLyNhanVien} />
       <Stack.Screen name="QuanLyThongKe" component={QuanLyThongKe} />
+      <Stack.Screen name="QuanLyKhachHang" component={QuanLyKhachHang} />
     </Stack.Navigator>
   );
 };

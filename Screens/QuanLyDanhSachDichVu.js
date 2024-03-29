@@ -128,6 +128,7 @@ const QuanLyDanhSachDichVu = () => {
       .then(res => {
         if (res.ok) {
           Alert.alert('Thêm thành công');
+          setShowAddDialog(false);
           getDanhSachDichVu();
         }
       })
@@ -143,7 +144,7 @@ const QuanLyDanhSachDichVu = () => {
       giaTien: updateGiaTien,
     };
 
-    fetch(`http://${COMMON.ipv4}:3000/employees/${selectedItem.id}`, {
+    fetch(`http://${COMMON.ipv4}:3000/dichvus/updateDichVu/${selectedItemId}`, {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
@@ -154,8 +155,9 @@ const QuanLyDanhSachDichVu = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Updated successfully', data);
-        setModals(false);
-        getProduct();
+        console.log('SSSS' + selectedItemId);
+        setShowUpdateDialog(false);
+        getDanhSachDichVu();
       })
       .catch(error => {
         console.error('Error updating product:', error);
@@ -167,26 +169,21 @@ const QuanLyDanhSachDichVu = () => {
 
   const toggleUpdateDialog = item => {
     setShowUpdateDialog(true);
+    setSelectedItemId(item._id);
     setUpdateTenDichVu(item.tenDichVu);
     setUpdateTrangThai(item.trangThai);
     setUpdateMoTa(item.moTa);
     setUpdateGiaTien(item.giaTien);
+    setIsEnabled(item.trangThai === 1);
   };
   const toggleDeleteDialog = item => {
     setSelectedItemId(item);
     setShowDeleteDialog(true);
-    setUpdateTenDichVu(item.tenDichVu);
-    setUpdateTrangThai(item.trangThai);
-    setUpdateMoTa(item.moTa);
-    setUpdateGiaTien(item.giaTien);
   };
 
   const fabStyle = {right: 16, bottom: 16};
   return (
     <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
-      <View>
-        <Text>Danh sách dịch vụ</Text>
-      </View>
       {loading ? (
         <ActivityIndicator animating={true} color="#2aa198" />
       ) : (
@@ -242,7 +239,7 @@ const QuanLyDanhSachDichVu = () => {
             <TextInput
               style={styles.input}
               placeholder="Giá Tiền"
-              value={updateGiaTien}
+              value={updateGiaTien.toString()}
               onChangeText={txt => setUpdateGiaTien(txt)}
               keyboardType="numeric"
             />
@@ -251,16 +248,16 @@ const QuanLyDanhSachDichVu = () => {
               <Switch
                 trackColor={{false: '#767577', true: '#81b0ff'}}
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                value={updateTrangThai}
+                value={isEnabled}
                 onValueChange={value => {
-                  setIsEnabled(value);
-                  setUpdateTrangThai(value ? 1 : 0);
+                  setIsEnabled(value); 
+                  setUpdateTrangThai(value ? 1 : 0); 
                 }}
               />
             </View>
             <View style={styles.buttonContainer}>
               <Button title="Đóng" onPress={() => setShowUpdateDialog(false)} />
-              <Button title="Thêm" onPress={ThemDichVu} />
+              <Button title="Sửa" onPress={CapNhatDichVu} />
             </View>
           </View>
         </View>
@@ -480,6 +477,7 @@ const styles = StyleSheet.create({
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent:'center',
     marginBottom: 10,
   },
   switchLabel: {

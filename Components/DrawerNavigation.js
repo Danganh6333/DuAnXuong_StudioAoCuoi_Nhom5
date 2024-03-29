@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
+import {StyleSheet, Text, View} from 'react-native';
+import {createDrawerNavigator, DrawerItem} from '@react-navigation/drawer';
+import {useNavigation} from '@react-navigation/native';
 import TrangChu from '../Screens/TrangChu';
 import QuanLyCongViec from '../Screens/QuanLyCongViec';
 import QuanLyDanhSachDichVu from '../Screens/QuanLyDanhSachDichVu';
@@ -10,10 +10,11 @@ import QuanLyNhanVien from '../Screens/QuanLyNhanVien';
 import QuanLyThongKe from '../Screens/QuanLyThongKe';
 import CustomDrawer from './CustomDrawer';
 import Icon from 'react-native-vector-icons/Ionicons';
+import QuanLyKhachHang from '../Screens/QuanLyKhachHang';
 
-const DrawerNavigation = (props) => {
+const DrawerNavigation = props => {
   const Drawer = createDrawerNavigator();
-  
+
   const handleFocus = (focused, route) => {
     if (focused) {
       switch (route.name) {
@@ -29,6 +30,8 @@ const DrawerNavigation = (props) => {
           return 'people';
         case 'Quản Lý Thống Kê':
           return 'analytics';
+        case 'Quản Lý Khách Hàng':
+          return 'walk';
         default:
           return 'home';
       }
@@ -46,6 +49,8 @@ const DrawerNavigation = (props) => {
           return 'people-outline';
         case 'Quản Lý Thống Kê':
           return 'analytics-outline';
+          case 'Quản Lý Khách Hàng':
+            return 'walk-outline';
         default:
           return 'home-outline';
       }
@@ -64,58 +69,95 @@ const DrawerNavigation = (props) => {
           fontSize: 15,
         },
       }}
-      drawerContent={(props) => <CustomDrawer {...props} />}>
+      drawerContent={props => <CustomDrawer {...props} />}>
       <Drawer.Screen
         name="Trang Chủ"
         component={TrangChu}
-        options={({ focused }) => ({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Trang Chủ' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Trang Chủ'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
       <Drawer.Screen
         name="Quản Lý Công Việc"
         component={QuanLyCongViec}
-        options={({ focused }) => ({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Quản Lý Công Việc' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Công Việc'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
       <Drawer.Screen
         name="Quản Lý Danh Sách Dịch Vụ"
         component={QuanLyDanhSachDichVu}
-        options={({ focused })=>({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Quản Lý Danh Sách Dịch Vụ' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Danh Sách Dịch Vụ'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
       <Drawer.Screen
         name="Quản Lý Hóa Đơn"
         component={QuanLyHoaDon}
-        options={({ focused })=>({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Quản Lý Hóa Đơn' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Hóa Đơn'})}
+              size={size}
+              color={color}
+            />
+          ),
+        })}
+      />
+      <Drawer.Screen
+        name="Quản Lý Khách Hàng"
+        component={QuanLyKhachHang}
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Khách Hàng'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
       <Drawer.Screen
         name="Quản Lý Nhân Viên"
         component={QuanLyNhanVien}
-        options={({ focused })=>({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Quản Lý Nhân Viên' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Nhân Viên'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
       <Drawer.Screen
         name="Quản Lý Thống Kê"
         component={QuanLyThongKe}
-        options={({ focused })=>({
-          drawerIcon: ({ color, size }) => (
-            <Icon name={handleFocus(focused, { name: 'Quản Lý Thống Kê' })} size={size} color={color} />
+        options={({focused}) => ({
+          drawerIcon: ({color, size}) => (
+            <Icon
+              name={handleFocus(focused, {name: 'Quản Lý Thống Kê'})}
+              size={size}
+              color={color}
+            />
           ),
         })}
       />
