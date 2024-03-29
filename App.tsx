@@ -45,7 +45,7 @@ const Stack = () => {
     <Stack.Navigator>
        <Stack.Screen
         name="DangKy"
-        component={QuanLyCongViec}
+        component={DangNhap}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
