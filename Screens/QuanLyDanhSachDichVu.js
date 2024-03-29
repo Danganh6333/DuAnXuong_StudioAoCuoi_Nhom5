@@ -12,6 +12,7 @@ import {
   Alert,
   TextInput,
   Switch,
+  ScrollView,
 } from 'react-native';
 import {ActivityIndicator} from 'react-native-paper';
 import COMMON from '../COMMON';
@@ -184,6 +185,22 @@ const QuanLyDanhSachDichVu = () => {
   const fabStyle = {right: 16, bottom: 16};
   return (
     <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
+      <View style={styles.buttonGroup}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={true}
+          style={{height: 38}}>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Tất Cả</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Từ 20.000 tới 50.000</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Từ 60.000 tới 100.000</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
       {loading ? (
         <ActivityIndicator animating={true} color="#2aa198" />
       ) : (
@@ -220,7 +237,7 @@ const QuanLyDanhSachDichVu = () => {
         labelStyle={styles.fabLabel}
         contentStyle={styles.fabContent}
       />
-      <Modal visible={showUpdateDialog} transparent={true}>
+      <Modal visible={showUpdateDialog} transparent={true} animationType='fade'>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Sửa Dịch Vụ</Text>
@@ -250,8 +267,8 @@ const QuanLyDanhSachDichVu = () => {
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
                 value={isEnabled}
                 onValueChange={value => {
-                  setIsEnabled(value); 
-                  setUpdateTrangThai(value ? 1 : 0); 
+                  setIsEnabled(value);
+                  setUpdateTrangThai(value ? 1 : 0);
                 }}
               />
             </View>
@@ -287,7 +304,7 @@ const QuanLyDanhSachDichVu = () => {
               <Switch
                 trackColor={{false: '#767577', true: '#81b0ff'}}
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                value={updateTrangThai}
+                value={isEnabled}
                 onValueChange={value => {
                   setIsEnabled(value);
                   setTrangThai(value ? 1 : 0);
@@ -477,7 +494,7 @@ const styles = StyleSheet.create({
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     marginBottom: 10,
   },
   switchLabel: {
@@ -488,6 +505,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 20,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#C8A2C8',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
