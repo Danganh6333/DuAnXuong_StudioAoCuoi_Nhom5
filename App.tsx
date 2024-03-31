@@ -30,10 +30,10 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="CapNhatThongTin" component={QuanLyHoaDon} />
+      <Stack.Screen name="CapNhatThongTin" component={DangKy} />
       <Stack.Screen
         name="DangKy"
-        component={QuanLyHoaDon}
+        component={DangNhap}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />

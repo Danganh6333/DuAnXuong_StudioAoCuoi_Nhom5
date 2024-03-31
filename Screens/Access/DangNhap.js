@@ -18,24 +18,24 @@ import { useUserId } from '../../Components/NhanVienIdContext';
 
 const DangNhap = () => {
   const navigation = useNavigation();
-  const [tendangnhap, settendangnhap] = useState('');
-  const [password, setpassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [matKhau, setMatKhau] = useState('');
   const [rememberPassword, setRememberPassword] = useState(false);
   const [visible, setVisible] = React.useState(false);
   const onToggleSnackBar = () => setVisible(!visible);
   const onDismissSnackBar = () => setVisible(false);
   const {setUserId} = useUserId();
   const handleLogin = async () => {
-    if (isEmpty(tendangnhap) || isEmpty(password)) {
+    if (isEmpty(email) || isEmpty(matKhau)) {
       console.log('Vui lòng điền đầy đủ thông tin');
       return;
     }
     try {
       const response = await axios.post(
-        `http://${COMMON.ipv4}:3000/nguoidungs/login`,
+        `http://${COMMON.ipv4}:3000/nhanviens/doLogin`,
         {
-          username: tendangnhap,
-          password: password,
+          email: email,
+          matKhau: matKhau,
         },
       );
       const userId = response.data.user._id;
@@ -70,14 +70,14 @@ const DangNhap = () => {
           <Text style={{marginLeft: 10}}>Usename</Text>
           <CustomTextInput
             placeholder="Tên Đăng Nhập"
-            value={tendangnhap}
-            onChangeText={settendangnhap}
+            value={email}
+            onChangeText={setEmail}
           />
           <Text style={{marginLeft: 10}}>password</Text>
           <CustomPasswordInput
             placeholder="Mật khẩu"
-            value={password}
-            onChangeText={setpassword}
+            value={matKhau}
+            onChangeText={setMatKhau}
           />
 
           <View style={styles.checkboxContainer}>

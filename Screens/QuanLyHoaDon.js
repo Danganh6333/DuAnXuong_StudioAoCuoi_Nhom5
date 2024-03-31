@@ -146,6 +146,14 @@ const QuanLyHoaDon = () => {
   useEffect(() => {
     updateTongTien();
   }, [selectedDichVus]);
+  useEffect(() => {
+    if (nhanVienData.length > 0) {
+      setIdNhanVien(nhanVienData[0]._id);
+    }
+    if (khachHangData.length > 0) {
+      setIdKhachHang(khachHangData[0]._id);
+    }
+  }, [nhanVienData, khachHangData]);
 
   useEffect(() => {
     getHoaDon();
@@ -208,9 +216,9 @@ const QuanLyHoaDon = () => {
             <View style={styles.pickerWrapper}>
               <Text>Mời Nhập Khách Hàng</Text>
               <Picker
-                selectedValue={nhanVienHoTen}
+                selectedValue={idNhanVien}
                 onValueChange={(itemValue, itemIndex) => {
-                  setNhanVienHoTen(itemValue);
+                  setIdNhanVien(itemValue);
                   console.log(itemValue);
                   const selectedNhanVien = nhanVienData.find(
                     nhanVien => nhanVien._id === itemValue,
@@ -231,10 +239,9 @@ const QuanLyHoaDon = () => {
             <View style={styles.pickerWrapper}>
               <Text>Mời Nhập Khách Hàng</Text>
               <Picker
-                selectedValue={khachHangHoTen}
+                selectedValue={idKhachHang}
                 onValueChange={(itemValue, itemIndex) => {
-                  setKhachHangHoTen(itemValue);
-                  console.log(itemValue);
+                  setIdKhachHang(itemValue);
                   const selectedKhachHang = khachHangData.find(
                     khachHang => khachHang._id === itemValue,
                   );
