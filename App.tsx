@@ -30,7 +30,7 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="CapNhatThongTin" component={DangKy} />
+      <Stack.Screen name="ManHinhChao" component={DangNhap} />
       <Stack.Screen
         name="DangKy"
         component={DangNhap}
@@ -51,8 +51,8 @@ const Stack = () => {
       />
 
       <Stack.Screen
-        name="ManHinhChao"
-        component={ManHinhChao}
+        name="CapNhatThongTin"
+        component={CapNhatThongTin}
         options={{headerShown: false}}
       />
 
