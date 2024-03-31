@@ -14,6 +14,7 @@ import CustomPasswordInput from '../../Components/CustomPasswordInput';
 import {useNavigation} from '@react-navigation/native';
 import {Snackbar} from 'react-native-paper';
 import COMMON from '../../COMMON';
+import { useUserId } from '../../Components/NhanVienIdContext';
 
 const DangNhap = () => {
   const navigation = useNavigation();
@@ -23,7 +24,7 @@ const DangNhap = () => {
   const [visible, setVisible] = React.useState(false);
   const onToggleSnackBar = () => setVisible(!visible);
   const onDismissSnackBar = () => setVisible(false);
-
+  const {setUserId} = useUserId();
   const handleLogin = async () => {
     if (isEmpty(tendangnhap) || isEmpty(password)) {
       console.log('Vui lòng điền đầy đủ thông tin');
@@ -37,8 +38,10 @@ const DangNhap = () => {
           password: password,
         },
       );
-
+      const userId = response.data.user._id;
+      console.log('User ID:', userId);
       console.log('Login response:', response.data);
+      setUserId(userId)
       navigation.navigate('Drawer');
     } catch (error) {
       console.log('Login failed:', error);
@@ -138,7 +141,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   snackbar: {
-    width:'100%'
+    width: '100%',
   },
   title: {
     fontSize: 35,

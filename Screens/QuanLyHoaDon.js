@@ -9,12 +9,15 @@ import {
   View,
   StatusBar,
   TouchableOpacity,
+  Alert,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {AnimatedFAB} from 'react-native-paper';
 import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
 import COMMON from '../COMMON';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const QuanLyHoaDon = () => {
   const [data, setData] = useState(null);
@@ -22,18 +25,32 @@ const QuanLyHoaDon = () => {
   const [khachHangData, setKhachHangData] = useState([]);
   const [khachHangHoTen, setKhachHangHoTen] = useState('');
   const [nhanVienData, setNhanVienData] = useState([]);
+  const [dichVuData, setDichVuData] = useState([]);
   const [nhanVienHoTen, setNhanVienHoTen] = useState('');
+  const [tenDichVu, setTenDichVu] = useState('');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [isExtended, setIsExtended] = useState(true);
   const [currentDate, setCurrentDate] = useState('');
-  const [tenKhachHang, setTenKhachHang] = useState('');
+  const [selectedDichVus, setSelectedDichVus] = useState([]);
+
   const [idNhanVien, setIdNhanVien] = useState('');
   const [idKhachHang, setIdKhachHang] = useState('');
-  const [tongTien, setTongTien] = useState('');
+  const [tongTien, setTongTien] = useState(0);
 
   const getCurrentDate = () => {
     var date = moment().utcOffset('+07:00').format('YYYY-MM-DD hh:mm:ss a');
     setCurrentDate(date);
+  };
+  const calculateTotalTongTien = () => {
+    let total = 0;
+    selectedDichVus.forEach(dichVu => {
+      total += dichVu.giaTien;
+    });
+    return total;
+  };
+  const updateTongTien = () => {
+    const totalTongTien = calculateTotalTongTien();
+    setTongTien(totalTongTien);
   };
 
   const onScroll = ({nativeEvent}) => {
@@ -55,6 +72,17 @@ const QuanLyHoaDon = () => {
       );
       const json = await response.json();
       setKhachHangData(json);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getSpinnerDichVu = async () => {
+    try {
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/dichvus/getDichVu`,
+      );
+      const json = await response.json();
+      setDichVuData(json);
     } catch (error) {
       console.error(error);
     }
@@ -87,13 +115,15 @@ const QuanLyHoaDon = () => {
   };
 
   const addHoaDon = async () => {
-    let url_api_add = `http://${COMMON.ipv4}:3000/hoadons/addHoaDon/`;
+    let url_api_add = `http://${COMMON.ipv4}:3000/hoadons/addHoaDon`;
     let obj = {
       idNhanVien: idNhanVien,
       idKhachHang: idKhachHang,
-      ngayTao: getCurrentDate,
+      ngayTao: getCurrentDate(),
+      idDichVus: selectedDichVus,
       tongTien: tongTien,
     };
+    console.log(obj);
     fetch(url_api_add, {
       method: 'POST',
       headers: {
@@ -106,20 +136,29 @@ const QuanLyHoaDon = () => {
         if (res.ok) {
           Alert.alert('Thêm thành công');
           setShowAddDialog(false);
-          getDanhSachDichVu();
+          getHoaDon();
         }
       })
       .catch(err => {
         console.log('Lỗi Thêm Nhân Viên', err);
       });
   };
+  useEffect(() => {
+    updateTongTien();
+  }, [selectedDichVus]);
 
   useEffect(() => {
     getHoaDon();
     getSpinnerKhachHang();
     getSpinnerNhanVien();
+    getSpinnerDichVu();
     getCurrentDate();
   }, []);
+  const removeSelectedDichVu = index => {
+    const updatedSelectedDichVus = [...selectedDichVus];
+    updatedSelectedDichVus.splice(index, 1);
+    setSelectedDichVus(updatedSelectedDichVus);
+  };
 
   return (
     <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
@@ -145,6 +184,7 @@ const QuanLyHoaDon = () => {
             );
           }}
           keyExtractor={item => item._id}
+          contentContainerStyle={styles.flatListContent}
         />
       )}
       <AnimatedFAB
@@ -165,42 +205,114 @@ const QuanLyHoaDon = () => {
             <Text style={styles.modalTitle}>Tạo Hóa Đơn</Text>
             <TextInput style={styles.input} placeholder="Nhập tên sản phẩm" />
             <Text style={styles.info}>Ngày tạo: {currentDate}</Text>
-            <Picker
-              selectedValue={nhanVienHoTen}
-              onValueChange={(itemValue, itemIndex) => {
-                setNhanVienHoTen(itemValue);
-                const selectedNhanVien = nhanVienData.find(
-                  nhanVien => nhanVien.hoTen === itemValue,
-                );
-                if (selectedNhanVien) {
-                  setIdNhanVien(selectedNhanVien.id);
-                }
-              }}>
-              {nhanVienData.map((nhanVien, index) => (
-                <Picker.Item
-                  key={index}
-                  label={nhanVien.hoTen}
-                  value={nhanVien.hoTen} 
-                />
-              ))}
-            </Picker>
-
-            <Picker
-              selectedValue={khachHangHoTen}
-              onValueChange={(itemValue, itemIndex) => {
-                setKhachHangHoTen(itemValue);
-                setIdKhachHang(itemValue);
-              }}>
-              {khachHangData.map((khachHang, index) => (
-                <Picker.Item
-                  key={index}
-                  label={khachHang.hoTen}
-                  value={khachHang.id}
-                />
-              ))}
-            </Picker>
-            <TextInput style={styles.input} placeholder="Nhập giá tiền" />
+            <View style={styles.pickerWrapper}>
+              <Text>Mời Nhập Khách Hàng</Text>
+              <Picker
+                selectedValue={nhanVienHoTen}
+                onValueChange={(itemValue, itemIndex) => {
+                  setNhanVienHoTen(itemValue);
+                  console.log(itemValue);
+                  const selectedNhanVien = nhanVienData.find(
+                    nhanVien => nhanVien._id === itemValue,
+                  );
+                  if (selectedNhanVien) {
+                    setIdNhanVien(selectedNhanVien._id);
+                  }
+                }}>
+                {nhanVienData.map((nhanVien, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={nhanVien.hoTen}
+                    value={nhanVien._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.pickerWrapper}>
+              <Text>Mời Nhập Khách Hàng</Text>
+              <Picker
+                selectedValue={khachHangHoTen}
+                onValueChange={(itemValue, itemIndex) => {
+                  setKhachHangHoTen(itemValue);
+                  console.log(itemValue);
+                  const selectedKhachHang = khachHangData.find(
+                    khachHang => khachHang._id === itemValue,
+                  );
+                  if (selectedKhachHang) {
+                    setIdKhachHang(selectedKhachHang._id);
+                  }
+                }}>
+                {khachHangData.map((khachHang, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={khachHang.hoTen}
+                    value={khachHang._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.pickerWrapper}>
+              <Text>Mời Bạn Chọn Dịch Vụ</Text>
+              <Picker
+                selectedValue={tenDichVu}
+                onValueChange={(itemValue, itemIndex) => {
+                  setTenDichVu(itemValue);
+                  const selectedDichVu = dichVuData.find(
+                    dichVu => dichVu._id === itemValue,
+                  );
+                  if (selectedDichVu) {
+                    const exists = selectedDichVus.some(
+                      dichVu => dichVu.idDichVu === selectedDichVu._id,
+                    );
+                    if (!exists) {
+                      const newItem = {
+                        idDichVu: selectedDichVu._id,
+                        giaTien: selectedDichVu.giaTien,
+                        tenDichVu: selectedDichVu.tenDichVu,
+                      };
+                      setSelectedDichVus(prevState => [...prevState, newItem]);
+                    } else {
+                      Alert.alert('This Dịch Vụ is already selected');
+                    }
+                  }
+                }}>
+                {dichVuData.map((dichVu, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={dichVu.tenDichVu}
+                    value={dichVu._id}
+                  />
+                ))}
+              </Picker>
+            </View>
+            <View style={styles.selectedDichVuList}>
+              <Text style={styles.selectedDichVuListTitle}>
+                Selected Dịch Vụ:
+              </Text>
+              <ScrollView>
+                {selectedDichVus.map((dichVu, index) => (
+                  <View key={index} style={styles.selectedDichVuItem}>
+                    <View style={{display: 'flex', flexDirection: 'column'}}>
+                      <Text>Tên: {dichVu.tenDichVu}</Text>
+                      <Text>Giá Tiền: {dichVu.giaTien}</Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => removeSelectedDichVu(index)}>
+                      <Icon name="close-sharp" size={22} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Nhập giá tiền"
+              value={tongTien.toString()}
+              editable={false}
+              onChangeText={txt => setTongTien(txt)}
+            />
             <View style={styles.buttonContainer}>
+              <Button title="Thêm" onPress={addHoaDon} />
               <Button title="Đóng" onPress={() => setShowAddDialog(false)} />
             </View>
           </View>
@@ -260,6 +372,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
   },
+  flatListContent: {
+    paddingBottom: 80,
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -276,5 +391,31 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  pickerWrapper: {
+    marginBottom: 10,
+  },
+  label: {
+    marginBottom: 5,
+    fontSize: 16,
+  },
+  selectedDichVuList: {
+    marginTop: 20,
+  },
+  selectedDichVuListTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  selectedDichVuItem: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 5,
+    gap: 180,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

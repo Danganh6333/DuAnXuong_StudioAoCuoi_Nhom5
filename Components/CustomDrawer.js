@@ -1,33 +1,40 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  DrawerContentScrollView,
+  DrawerItemList,
+  useDrawerProgress,
+} from '@react-navigation/drawer';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-const CustomDrawer = (props) => {
+const CustomDrawer = props => {
   const navigate = useNavigation();
-
   return (
-    <View style={styles.container}>
-      <DrawerContentScrollView {...props}>
-        <View style={styles.header}>
-          <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-          <Text style={styles.headerText}>Xin chào,người dùng</Text>
-        </View>
-        <DrawerItemList {...props} />
-      </DrawerContentScrollView>
+      <View style={styles.container}>
+        <DrawerContentScrollView {...props}>
+          <View style={styles.header}>
+            <Image
+              source={require('../assets/images/logo.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.headerText}>Xin chào,người dùng</Text>
+          </View>
+          <DrawerItemList {...props} />
+        </DrawerContentScrollView>
 
-      <TouchableOpacity
-        onPress={() => {
-          navigate.navigate('ManHinhChao');
-        }}
-        style={styles.logoutButton}>
-        <View style={styles.logoutButtonContainer}>
-          <Icon name="log-out-outline" size={22} color="#333" />
-          <Text style={styles.logoutButtonText}>Đăng Xuất</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('ManHinhChao');
+          }}
+          style={styles.logoutButton}>
+          <View style={styles.logoutButtonContainer}>
+            <Icon name="log-out-outline" size={22} color="#333" />
+            <Text style={styles.logoutButtonText}>Đăng Xuất</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
   );
 };
 
@@ -43,10 +50,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 100, 
-    height: 100, 
+    width: 100,
+    height: 100,
     marginBottom: 10,
-    resizeMode: 'contain', 
+    resizeMode: 'contain',
   },
   headerText: {
     fontSize: 20,

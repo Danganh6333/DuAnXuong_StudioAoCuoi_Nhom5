@@ -14,31 +14,36 @@ import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
 import DrawerNavigation from './Components/DrawerNavigation';
 import QuanLyKhachHang from './Screens/QuanLyKhachHang';
+import CapNhatThongTin from './Screens/Access/CapNhatThongTin';
+import {NhanVienIdContext} from './Components/NhanVienIdContext';
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack />
+      <NhanVienIdContext>
+        <Stack />
+      </NhanVienIdContext>
     </NavigationContainer>
   );
 };
-
 const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
+      <Stack.Screen name="CapNhatThongTin" component={QuanLyHoaDon} />
       <Stack.Screen
         name="DangKy"
-        component={QuanLyCongViec}
+        component={QuanLyHoaDon}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />
       <Stack.Screen
         name="Drawer"
         component={DrawerNavigation}
-        options={{headerShown: false}}
-      />
+        options={{headerShown: true}
 
+      }
+      />
       <Stack.Screen
         name="ThayDoiMatKhau"
         component={ThayDoiMatKhau}

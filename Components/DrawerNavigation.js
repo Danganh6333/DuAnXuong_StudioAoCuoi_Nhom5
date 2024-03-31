@@ -68,7 +68,9 @@ const DrawerNavigation = props => {
           fontFamily: 'Urbanist-VariableFont_wght',
           fontSize: 15,
         },
+        
       }}
+      
       drawerContent={props => <CustomDrawer {...props} />}>
       <Drawer.Screen
         name="Trang Chủ"
@@ -81,6 +83,7 @@ const DrawerNavigation = props => {
               color={color}
             />
           ),
+       
         })}
       />
       <Drawer.Screen
