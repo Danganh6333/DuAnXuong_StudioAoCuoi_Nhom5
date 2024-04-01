@@ -7,7 +7,6 @@ import {
 } from '@react-navigation/drawer';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 const CustomDrawer = props => {
   const navigate = useNavigation();

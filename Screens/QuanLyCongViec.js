@@ -13,7 +13,7 @@ import {
   TextInput,
 } from 'react-native';
 import axios from 'axios';
-import CheckBox from '@react-native-community/checkbox';
+import CheckBox, {Checkbox} from '@react-native-community/checkbox';
 import {Swipeable} from 'react-native-gesture-handler';
 import CustomTextInput from '../Components/CustomTextInput';
 import Button from '../Components/Button';
@@ -43,12 +43,9 @@ const QuanLyCongViec = () => {
   const [show, setShow] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [nhanVien, setNhanVien] = useState([]);
-  const [idNhanVien, setIdNhanVien] = useState(selectedEmployee);
-  const [employees, setEmployees] = useState([]);
-  const EmployeePicker = () => {
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const EmployeePicker = ({selectedEmployeeId, onEmployeeChange}) => {
     const [employees, setEmployees] = useState([]);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
-
     useEffect(() => {
       const fetchData = async () => {
         const response = await axios.get(
@@ -60,13 +57,12 @@ const QuanLyCongViec = () => {
     }, []);
 
     const handleEmployeeChange = value => {
-      setIdNhanVien(value); // Cập nhật idNhanVien trực tiếp
-      setSelectedEmployee(value);
+      onEmployeeChange(value);
     };
 
     return (
       <Picker
-        selectedValue={selectedEmployee}
+        selectedValue={selectedEmployeeId}
         onValueChange={handleEmployeeChange}>
         <Picker.Item label="Chọn nhân viên" value={null} key="blank" />
         {employees.map(employee => (
@@ -96,7 +92,7 @@ const QuanLyCongViec = () => {
       return; // Prevent update if required fields are empty
     }
     const obj = {
-      idNhanVien,
+      idNhanVien: selectedEmployeeId, // Use the selected employee ID directly
       ngayBatDau,
       trangThai,
       tenCongViec,
@@ -105,6 +101,7 @@ const QuanLyCongViec = () => {
     };
     try {
       await axios.post(`http://${COMMON.ipv4}:3000/congviecs/addCongViec`, obj);
+      console.log(obj.idNhanVien);
       getList_cv();
       setTenCongViec('');
       setTrangThai('');
@@ -114,9 +111,10 @@ const QuanLyCongViec = () => {
       setModalVisible_addcv(false);
     } catch (error) {
       console.error(error);
-      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi thêm nhân viên!' + error); // Inform user about update error
+      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi thêm nhân viên!' + error);
     }
   };
+
   const onChangeNgayBatDau = (event, selectedDate) => {
     const currentDate = selectedDate || date;
 
@@ -156,7 +154,7 @@ const QuanLyCongViec = () => {
   };
   //format date
   const getFormattedDate = date => {
-    return moment(date).format('YYYY-MM-DD');
+    return moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD');
   };
 
   // get list cong việc
@@ -230,8 +228,11 @@ const QuanLyCongViec = () => {
     }
   };
   const renderItem = ({item}) => {
-    const employee = nhanVien.find(nv => nv._id === item.idNhanVien);
+    const employee = item.idNhanVien
+      ? nhanVien.find(nv => nv._id === item.idNhanVien._id)
+      : null;
     const tenNhanVien = employee ? employee.hoTen : 'Đang tải...';
+
     return (
       <Pressable
         onPress={() => {
@@ -250,7 +251,9 @@ const QuanLyCongViec = () => {
           }}>
           <View>
             <Text style={{color: 'black'}}>{item.tenCongViec}</Text>
-            <Text style={{color: 'black'}}>{item.idNhanVien}</Text>
+            {item.idNhanVien && (
+              <Text style={{color: 'black'}}>{item.idNhanVien._id}</Text>
+            )}
             <Text style={{color: 'black'}}>{tenNhanVien}</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
@@ -285,6 +288,7 @@ const QuanLyCongViec = () => {
       </Pressable>
     );
   };
+
   return (
     <View style={{flex: 1}}>
       <View style={{flex: 1}}>
@@ -331,7 +335,10 @@ const QuanLyCongViec = () => {
               placeholder="Tên công việc"
               onChangeText={txt => setTenCongViec(txt)}
             />
-            <EmployeePicker />
+            <EmployeePicker
+              selectedEmployeeId={selectedEmployeeId}
+              onEmployeeChange={setSelectedEmployeeId}
+            />
             <View
               style={{
                 alignItems: 'center',
