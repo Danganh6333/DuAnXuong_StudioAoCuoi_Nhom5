@@ -14,12 +14,15 @@ import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
 import DrawerNavigation from './Components/DrawerNavigation';
 import QuanLyKhachHang from './Screens/QuanLyKhachHang';
+import {NhanVienIdContext} from './Components/NhanVienIdContext';
 
 const App = () => {
   return (
     <NavigationContainer>
+    <NhanVienIdContext>
       <Stack />
-    </NavigationContainer>
+    </NhanVienIdContext>
+  </NavigationContainer>
   );
 };
 
@@ -29,7 +32,7 @@ const Stack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="DangKy"
-        component={QuanLyCongViec}
+        component={DangNhap}
         options={{headerShown: false}}
       />
       <Stack.Screen name="DangNhap" component={DangNhap} />

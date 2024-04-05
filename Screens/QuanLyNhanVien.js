@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Swipeable } from 'react-native-gesture-handler';
 import CustomTextInput from '../Components/CustomTextInput';
 import Button from '../Components/Button';
+import COMMON from '../COMMON';
 const QuanLyNhanVien = () => {
 
   const [nhanVien, setNhanVien] = useState([]);
@@ -34,7 +35,7 @@ const QuanLyNhanVien = () => {
   };
   const getList_nv = async () => {
     try {
-      const response = await axios.get('http://192.168.2.102:3000/nhanviens/getNhanVien');
+      const response = await axios.get(`http://${COMMON.ipv4}:3000/nhanviens/getNhanVien`);
       setNhanVien(response.data);
     } catch (error) {
       console.error(error);
@@ -53,17 +54,14 @@ const QuanLyNhanVien = () => {
     else if(!isValidDienThoai(dienThoai)){
       Alert.alert('Số diện thoại không hợp lệ!');
       return;
-   
     }
-
-
     if (!id || !hoTen || !email || !diaChi || !dienThoai) {
       setModalVisible_Isempty(true)
       return; // Prevent update if required fields are empty
     }
-    const obj = { hoTen, email, diaChi, dienThoai, ghiChu };
+    const obj = { hoTen, email , diaChi, dienThoai, ghiChu };
     try {
-      await axios.put(`http://192.168.2.102:3000/nhanviens/updateNhanVien/${id}`, obj);
+      await axios.put(`http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${id}`, obj);
       getList_nv(); // Refetch employee list after successful update
       setModalVisible_editnv(false); // Close edit modal
     } catch (error) {
@@ -83,7 +81,7 @@ const QuanLyNhanVien = () => {
     const obj = { hoTen, tenNguoiDung, matKhau, email, diaChi, dienThoai, ghiChu };
 
     try {
-      await axios.post('http://192.168.2.102:3000/nhanviens/addNhanVien', obj);
+      await axios.post(`http://${COMMON.ipv4}:3000/nhanviens/addNhanVien`, obj);
       getList_nv(); // Refetch employee list after successful update
       setHoTen('')
       setEmail('')
@@ -106,7 +104,7 @@ const QuanLyNhanVien = () => {
     }
   
     try {
-      const response = await axios.delete(`http://192.168.2.102:3000/nhanviens/deleteNhanVien/${id}`);
+      const response = await axios.delete(`http://${COMMON.ipv4}:3000/nhanviens/deleteNhanVien/${id}`);
      response.data.success 
        getList_nv();
       setModalVisible_Delenv(false)
@@ -124,9 +122,12 @@ const QuanLyNhanVien = () => {
       }}>
         <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
         </View>
-        <View style={{ backgroundColor: '#fff', height: 80, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Image style={{ width: 35, height: 35, tintColor: '#70cbff' }} source={require('../img/user.png')} />
-          <View>
+        <View style={{ backgroundColor: '#fff', height: 80, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start' }}>
+        <View style={{width:'15%'}}>
+            <Image style={{ width: 35, height: 35, tintColor: '#70cbff' }} source={require('../img/user.png')} />
+        
+        </View>
+          <View style={{width:'65%'}}>
             <Text style={{ color: 'black' }}>{item.hoTen}</Text>
             <Text style={{ color: 'black' }}>{item.email}</Text>
           </View>
