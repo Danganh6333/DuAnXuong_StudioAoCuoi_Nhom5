@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {
   DrawerContentScrollView,
@@ -8,8 +8,11 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const CustomDrawer = props => {
+
+const CustomDrawer = ({ userData, ...props }) => {
+  
   const navigate = useNavigation();
+  
   return (
       <View style={styles.container}>
         <DrawerContentScrollView {...props}>
@@ -18,7 +21,7 @@ const CustomDrawer = props => {
               source={require('../assets/images/logo.png')}
               style={styles.logo}
             />
-            <Text style={styles.headerText}>Xin chào,người dùng</Text>
+            <Text style={styles.headerText}>Xin chào,{userData.user.tenNguoiDung}</Text>
           </View>
           <DrawerItemList {...props} />
         </DrawerContentScrollView>

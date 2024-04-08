@@ -30,11 +30,17 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
+      <Stack.Screen name="ManHinhChao" component={DangNhap} />
+      <Stack.Screen
+        name="DangKy"
+        component={DangNhap}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen name="DangNhap" component={DangNhap} />
       <Stack.Screen
         name="Drawer"
         component={DrawerNavigation}
         options={{headerShown: true}
-
       }
       />
       <Stack.Screen name="ManHinhChao" component={ManHinhChao} />
