@@ -42,7 +42,7 @@ const DangNhap = () => {
       console.log('User ID:', userId);
       console.log('Login response:', response.data);
       setUserId(userId)
-      navigation.navigate('Drawer');
+      navigation.navigate('Drawer', { userData: response.data });
     } catch (error) {
       console.log('Login failed:', error);
       setVisible(true);

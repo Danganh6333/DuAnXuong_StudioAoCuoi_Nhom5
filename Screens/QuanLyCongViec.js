@@ -89,10 +89,10 @@ const QuanLyCongViec = () => {
   const postList_cv = async () => {
     if (!tenCongViec || !noiDungCongViec || !ngayKetThuc || !ngayBatDau) {
       setModalVisible_Isempty(true);
-      return; // Prevent update if required fields are empty
+      return;
     }
     const obj = {
-      idNhanVien: selectedEmployeeId, // Use the selected employee ID directly
+      idNhanVien: selectedEmployeeId, 
       ngayBatDau,
       trangThai,
       tenCongViec,
@@ -117,12 +117,12 @@ const QuanLyCongViec = () => {
 
   const onChangeNgayBatDau = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
     setShow(false);
-
+  
     let tempDatengayBatDau = new Date(currentDate);
+    tempDatengayBatDau.setHours(0, 0, 0, 0); 
     let fDatengayBatDau =
       tempDatengayBatDau.getFullYear() +
       '-' +
@@ -130,16 +130,17 @@ const QuanLyCongViec = () => {
       '-' +
       tempDatengayBatDau.getDate();
     setNgayBatDau(fDatengayBatDau);
-
+  
     console.log(fDatengayBatDau);
   };
-
+  
   const onChangeNgayKetThuc = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === 'ios');
     setDate(currentDate);
     setShow(false);
     let tempDatengayKetThuc = new Date(currentDate);
+    tempDatengayKetThuc.setHours(0, 0, 0, 0);
     let fDatengayKetThuc =
       tempDatengayKetThuc.getFullYear() +
       '-' +
@@ -148,6 +149,7 @@ const QuanLyCongViec = () => {
       tempDatengayKetThuc.getDate();
     setNgayKetThuc(fDatengayKetThuc);
   };
+  
   const showMode = currentMode => {
     setShow(true);
     setMode(currentMode);

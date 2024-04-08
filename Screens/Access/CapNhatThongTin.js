@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,6 +12,7 @@ import {useUserId} from '../../Components/NhanVienIdContext';
 import COMMON from '../../COMMON';
 import {useNavigation} from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
+import {Image} from 'react-native';
 
 const CapNhatThongTin = () => {
   const [hoTen, setHoTen] = useState('');
@@ -21,6 +22,12 @@ const CapNhatThongTin = () => {
   const [diaChi, setDiaChi] = useState('');
   const [dienThoai, setDienThoai] = useState('');
   const [ghiChu, setGhiChu] = useState('');
+  const [editHoTen, setEditHoTen] = useState('');
+  const [editTenNguoiDung, setEditTenNguoiDung] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editDiaChi, setEditDiaChi] = useState('');
+  const [editDienThoai, setEditDienThoai] = useState('');
+  const [editGhiChu, setEditGhiChu] = useState('');
   const {userId} = useUserId();
   const [anhNhanVien, setAnhNhanVien] = useState(null);
   const chonAnh = useCallback(() => {
@@ -30,25 +37,43 @@ const CapNhatThongTin = () => {
     };
     ImagePicker.launchImageLibrary(option, setAnhNhanVien);
   }, []);
+  const layThongTin = async () => {
+    try {
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/nhanviens/SearchNhanVienById/${userId}`,
+      );
+      const json = await response.json();
+      setTenNguoiDung(json.data.tenNguoiDung);
+      setEmail(json.data.email);
+      setHoTen(json.data.hoTen);
+      setDiaChi(json.data.diaChi);
+      setDienThoai(json.data.dienThoai);
+      setGhiChu(json.data.ghiChu);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    layThongTin();
+  }, []);
+
   const updateThongTin = async () => {
     const updatedItem = {
-      hoTen: hoTen,
-      tenNguoiDung: tenNguoiDung,
-      diaChi: diaChi,
-      dienThoai: dienThoai,
-      ghiChu: ghiChu,
+      hoTen: editHoTen,
+      tenNguoiDung: editTenNguoiDung,
+      diaChi: editDiaChi,
+      dienThoai: editDienThoai,
+      ghiChu: editGhiChu,
     };
-    fetch(
-      `http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${userId}`,
-      {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedItem),
+    fetch(`http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${userId}`, {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
-    )
+      body: JSON.stringify(updatedItem),
+    })
       .then(response => response.json())
       .then(data => {
         console.log('Updated successfully', data);
@@ -60,46 +85,56 @@ const CapNhatThongTin = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Thông Tin Cá Nhân</Text>
-      <TouchableOpacity style={styles.imagePickerButton} onPress={()=>chonAnh()}>
-        <Icon name="person-circle-outline" size={90} color="#007bff" />
+      <TouchableOpacity
+        style={styles.imagePickerButton}
+        onPress={() => chonAnh()}>
+        {anhNhanVien ? (
+          <Image
+            source={{uri: anhNhanVien.assets[0].uri}}
+            style={{width: 90, height: 90, borderRadius: 45}}
+          />
+        ) : (
+          <Icon name="person-circle-outline" size={90} color="#007bff" />
+        )}
       </TouchableOpacity>
+
       <Text style={styles.label}>Chọn Ảnh:</Text>
       <TextInput
         style={styles.input}
         value={hoTen}
-        onChangeText={setHoTen}
+        onChangeText={txt => setEditHoTen(txt)}
         placeholder="Họ Tên"
       />
       <TextInput
         style={styles.input}
         value={tenNguoiDung}
-        onChangeText={setTenNguoiDung}
+        onChangeText={txt => setEditTenNguoiDung(txt)}
         placeholder="Tên Người Dùng"
       />
       <TextInput
         style={styles.input}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={txt => setEditEmail(txt)}
         placeholder="Email"
         keyboardType="email-address"
       />
       <TextInput
         style={styles.input}
         value={diaChi}
-        onChangeText={setDiaChi}
+        onChangeText={txt => setEditDiaChi(txt)}
         placeholder="Địa Chỉ"
       />
       <TextInput
         style={styles.input}
         value={dienThoai}
-        onChangeText={setDienThoai}
+        onChangeText={txt => setEditDienThoai(txt)}
         placeholder="Điện Thoại"
         keyboardType="phone-pad"
       />
       <TextInput
         style={[styles.input, {height: 100}]}
         value={ghiChu}
-        onChangeText={setGhiChu}
+        onChangeText={txt => setEditGhiChu(txt)}
         placeholder="Ghi Chú"
         multiline
       />

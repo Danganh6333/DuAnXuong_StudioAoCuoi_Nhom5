@@ -11,7 +11,7 @@ const Button = ({ title, onPress }) => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#B89676', // Màu sắc thương hiệu riêng
+    backgroundColor: '#B89676', 
     borderRadius: 20,
     padding: 15,
     alignItems: 'center',

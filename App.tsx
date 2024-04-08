@@ -30,7 +30,7 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="ManHinhChao" component={CapNhatThongTin} />
+      <Stack.Screen name="ManHinhChao" component={DangNhap} />
       <Stack.Screen
         name="DangKy"
         component={DangNhap}
@@ -41,7 +41,6 @@ const Stack = () => {
         name="Drawer"
         component={DrawerNavigation}
         options={{headerShown: true}
-
       }
       />
       <Stack.Screen

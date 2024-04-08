@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -18,32 +18,32 @@ import {ActivityIndicator} from 'react-native-paper';
 import COMMON from '../COMMON';
 import {AnimatedFAB} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import * as ImagePicker from 'react-native-image-picker';
+import {Chip} from 'react-native-paper';
 
 const Item = ({item, toggleUpdateDialog, toggleDeleteDialog}) => (
   <TouchableOpacity style={styles.itemContainer}>
-    <View style={styles.itemContent}>
-      <Text style={styles.itemTitle}>{item.tenDichVu}</Text>
-      <Text style={styles.itemPrice}>{item.giaTien.toLocaleString()} VNĐ</Text>
+    <View style={styles.imageContainer}>
+      <Image source={{uri: item.anhDichVu}} style={styles.itemImage} />
     </View>
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-      }}>
-      <Text style={styles.itemDescription}>{item.moTa}</Text>
-      <View style={{display: 'flex', flexDirection: 'row'}}>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => toggleDeleteDialog(item._id)}>
-          <AntDesign name="close" style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => toggleUpdateDialog(item)}>
-          <AntDesign name="form" style={styles.icon} />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.contentContainer}>
+      <Text style={styles.title}>Tên Dịch Vụ {item.tenDichVu}</Text>
+      <Text style={styles.description}>Mô Tả {item.moTa}</Text>
+      <Text style={styles.price}>
+        Giá Tiền {item.giaTien.toLocaleString()} VNĐ
+      </Text>
+    </View>
+    <View style={styles.iconContainer}>
+      <TouchableOpacity
+        style={styles.iconButton}
+        onPress={() => toggleDeleteDialog(item._id)}>
+        <AntDesign name="close" style={styles.icon} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.iconButton}
+        onPress={() => toggleUpdateDialog(item)}>
+        <AntDesign name="form" style={styles.icon} />
+      </TouchableOpacity>
     </View>
   </TouchableOpacity>
 );
@@ -58,13 +58,22 @@ const QuanLyDanhSachDichVu = () => {
   const [tenDichVu, setTenDichVu] = useState('');
   const [trangThai, setTrangThai] = useState(0);
   const [moTa, setMoTa] = useState('');
+  const [selectedChip, setSelectedChip] = useState(null);
+
+  const [updateLoaiDichVu, setUpdateLoaiDichVu] = useState(0);
   const [giaTien, setGiaTien] = useState('');
+  const [updateAnhDichVu, setUpdateAnhDichVu] = useState('');
+  const [loaiDichVu, setloaiDichVu] = useState(0)
+  const [anhDichVu, setAnhDichVu] = useState('');
   const [updateTenDichVu, setUpdateTenDichVu] = useState('');
   const [updateTrangThai, setUpdateTrangThai] = useState(0);
   const [updateMoTa, setUpdateMoTa] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
+  const [selectedServiceType, setSelectedServiceType] = useState(null);
+
   const [updateGiaTien, setUpdateGiaTien] = useState('');
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [focusedButton, setFocusedButton] = useState(null);
   const getDanhSachDichVu = async () => {
     try {
       const response = await fetch(
@@ -109,21 +118,65 @@ const QuanLyDanhSachDichVu = () => {
       setShowDeleteDialog(false);
     }
   };
-  const ThemDichVu = () => {
-    let url_api_add = `http://${COMMON.ipv4}:3000/dichvus/addDichVu/`;
-    let obj = {
-      tenDichVu: tenDichVu,
-      trangThai: trangThai,
-      moTa: moTa,
-      giaTien: giaTien,
+  const chooseImage = useCallback(() => {
+    let options = {
+      mediaType: 'photo',
+      selectionLimit: 1,
+      includeBase64: true,
     };
+
+    ImagePicker.launchImageLibrary(options, response => {
+      if (
+        !response.didCancel &&
+        !response.errorCode &&
+        response.assets.length > 0
+      ) {
+        setAnhDichVu(response.assets[0].uri);
+      } else {
+        console.log('User canceled image picker or encountered an error');
+      }
+    });
+  }, []);
+  const chooseImageEdit = useCallback(() => {
+    let options = {
+      mediaType: 'photo',
+      selectionLimit: 1,
+      includeBase64: true,
+    };
+
+    ImagePicker.launchImageLibrary(options, response => {
+      if (
+        !response.didCancel &&
+        !response.errorCode &&
+        response.assets.length > 0
+      ) {
+        setUpdateAnhDichVu(response.assets[0].uri);
+      } else {
+        console.log('User canceled image picker or encountered an error');
+      }
+    });
+  }, []);
+  const ThemDichVu = () => {
+    let url_api_add = `http://${COMMON.ipv4}:3000/dichvus/addDichVuWithImage`;
+    let formData = new FormData();
+    formData.append('tenDichVu', tenDichVu);
+    formData.append('trangThai', trangThai);
+    formData.append('loaiDichVu', loaiDichVu);
+    formData.append('moTa', moTa);
+    formData.append('giaTien', giaTien);
+    formData.append('anhDichVu', {
+      uri: anhDichVu,
+      type: 'image/jpeg',
+      name: 'anhDichVu.jpg',
+    });
+
     fetch(url_api_add, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
-      body: JSON.stringify(obj),
+      body: formData,
     })
       .then(res => {
         if (res.ok) {
@@ -133,9 +186,10 @@ const QuanLyDanhSachDichVu = () => {
         }
       })
       .catch(err => {
-        console.log('Lỗi Thêm Nhân Viên', err);
+        console.log('Lỗi Thêm Dịch Vụ', err);
       });
   };
+
   const CapNhatDichVu = () => {
     const updatedItem = {
       tenDichVu: updateTenDichVu,
@@ -143,26 +197,64 @@ const QuanLyDanhSachDichVu = () => {
       moTa: updateMoTa,
       giaTien: updateGiaTien,
     };
+    let options = {
+      mediaType: 'photo',
+      selectionLimit: 1,
+      includeBase64: true,
+    };
 
-    fetch(`http://${COMMON.ipv4}:3000/dichvus/updateDichVu/${selectedItemId}`, {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedItem),
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Updated successfully', data);
-        console.log('SSSS' + selectedItemId);
-        setShowUpdateDialog(false);
-        getDanhSachDichVu();
-      })
-      .catch(error => {
-        console.error('Error updating product:', error);
-      });
+    ImagePicker.launchImageLibrary(options, response => {
+      if (
+        !response.didCancel &&
+        !response.errorCode &&
+        response.assets.length > 0
+      ) {
+        const imageData = response.assets[0];
+        const formData = new FormData();
+        formData.append('image', {
+          uri: imageData.uri,
+          type: imageData.type,
+          name: imageData.fileName,
+        });
+
+        fetch(`http://${COMMON.ipv4}:3000/uploadImage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(imageResponse => {
+            updatedItem.anhDichVu = imageResponse.imageUrl;
+            fetch(
+              `http://${COMMON.ipv4}:3000/dichvus/updateDichVu/${selectedItemId}`,
+              {
+                method: 'PUT',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedItem),
+              },
+            )
+              .then(response => response.json())
+              .then(data => {
+                console.log('Updated successfully', data);
+                setShowUpdateDialog(false);
+                getDanhSachDichVu();
+              })
+              .catch(error => {
+                console.error('Error updating service:', error);
+              });
+          })
+          .catch(error => {
+            console.error('Error uploading image:', error);
+          });
+      }
+    });
   };
+
   const toggleAddDialog = value => {
     setShowAddDialog(value);
   };
@@ -173,6 +265,8 @@ const QuanLyDanhSachDichVu = () => {
     setUpdateTenDichVu(item.tenDichVu);
     setUpdateTrangThai(item.trangThai);
     setUpdateMoTa(item.moTa);
+    setUpdateLoaiDichVu(item.loaiDichVu);
+    setUpdateAnhDichVu(item.anhDichVu);
     setUpdateGiaTien(item.giaTien);
     setIsEnabled(item.trangThai === 1);
   };
@@ -180,7 +274,46 @@ const QuanLyDanhSachDichVu = () => {
     setSelectedItemId(item);
     setShowDeleteDialog(true);
   };
+  const searchByPriceRange = async (startPrice, endPrice) => {
+    try {
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/dichvus/searchDichVuByPrice?giaTien_start=${startPrice}&giaTien_end=${endPrice}`,
+      );
+      const json = await response.json();
+      setData(json.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const searchByType = async type => {
+    try {
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/dichvus/searchDichVuByType?loaiDichVu=${type}`,
+      );
+      const json = await response.json();
+      setData(json.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Call searchByType when the selected service type changes
+  useEffect(() => {
+    if (selectedServiceType !== null) {
+      setLoading(true);
+      searchByType(selectedServiceType);
+    }
+  }, [selectedServiceType]);
+
+  // const handlePriceRangeButton = (startPrice, endPrice) => {
+  //   setLoading(true);
+  //   searchByPriceRange(startPrice, endPrice);
+  //   setFocusedButton({ startPrice, endPrice });
+  // };
   const fabStyle = {right: 16, bottom: 16};
   return (
     <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
@@ -189,14 +322,32 @@ const QuanLyDanhSachDichVu = () => {
           horizontal
           showsHorizontalScrollIndicator={true}
           style={{height: 38}}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Tất Cả</Text>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              focusedButton === null && styles.focusedButton,
+            ]}
+            onPress={() => {
+              getDanhSachDichVu();
+              setFocusedButton(null);
+            }}>
+            <Text
+              style={[
+                styles.buttonText,
+                focusedButton === null && styles.focusedButtonText,
+              ]}>
+              Tất Cả
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Từ 20.000 tới 50.000</Text>
+          <TouchableOpacity
+            style={[styles.button]}
+            onPress={() => setSelectedServiceType(0)}>
+            <Text style={[styles.buttonText]}>Dịch Vụ Đơn</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Từ 60.000 tới 100.000</Text>
+          <TouchableOpacity
+            style={[styles.button]}
+            onPress={() => setSelectedServiceType(1)}>
+            <Text style={[styles.buttonText]}>Dịch Vụ Theo Gói</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -236,10 +387,11 @@ const QuanLyDanhSachDichVu = () => {
         labelStyle={styles.fabLabel}
         contentStyle={styles.fabContent}
       />
-      <Modal visible={showUpdateDialog} transparent={true} animationType='fade'>
+      <Modal visible={showUpdateDialog} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Sửa Dịch Vụ</Text>
+            <Image source={{uri: updateAnhDichVu}} style={styles.modalImage} />
             <TextInput
               style={styles.input}
               placeholder="Tên Dịch Vụ"
@@ -271,9 +423,50 @@ const QuanLyDanhSachDichVu = () => {
                 }}
               />
             </View>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginVertical: 23,
+                alignItems: 'center',
+                gap: 5,
+              }}>
+              <Text>Loại Dịch Vụ : </Text>
+              <Chip
+                mode="outlined"
+                style={selectedChip === 0 ? styles.selectedChip : null}
+                onPress={() => {
+                  setLoaiDichVu(0);
+                  setSelectedChip(0);
+                }}>
+                Dịch Vụ Đơn
+              </Chip>
+              <Chip
+                mode="outlined"
+                style={selectedChip === 1 ? styles.selectedChip : null}
+                onPress={() => {
+                  setLoaiDichVu(1);
+                  setSelectedChip(1);
+                }}>
+                Dịch Vụ Gói
+              </Chip>
+            </View>
+            <TouchableOpacity
+              style={styles.chooseImageButton}
+              onPress={chooseImageEdit}>
+              <Text style={styles.chooseImageText}>Chọn ảnh</Text>
+            </TouchableOpacity>
             <View style={styles.buttonContainer}>
-              <Button title="Đóng" onPress={() => setShowUpdateDialog(false)} />
-              <Button title="Sửa" onPress={CapNhatDichVu} />
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowUpdateDialog(false)}>
+                <Text style={styles.buttonText}>Đóng</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={CapNhatDichVu}>
+                <Text style={styles.buttonText}>Sửa</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -282,6 +475,9 @@ const QuanLyDanhSachDichVu = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Thêm Dịch Vụ Mới</Text>
+            {anhDichVu && (
+              <Image source={{uri: anhDichVu}} style={styles.modalImage} />
+            )}
             <TextInput
               style={styles.input}
               placeholder="Tên Dịch Vụ"
@@ -310,9 +506,49 @@ const QuanLyDanhSachDichVu = () => {
                 }}
               />
             </View>
+
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                marginVertical: 23,
+                alignItems: 'center',
+                gap: 5,
+              }}>
+              <Text>Loại Dịch Vụ : </Text>
+              <Chip
+                mode="outlined"
+                style={selectedChip === 0 ? styles.selectedChip : null}
+                onPress={() => {
+                  setLoaiDichVu(0);
+                  setSelectedChip(0);
+                }}>
+                Dịch Vụ Đơn
+              </Chip>
+              <Chip
+                mode="outlined"
+                style={selectedChip === 1 ? styles.selectedChip : null}
+                onPress={() => {
+                  setLoaiDichVu(1);
+                  setSelectedChip(1);
+                }}>
+                Dịch Vụ Gói
+              </Chip>
+            </View>
+            <TouchableOpacity
+              style={styles.chooseImageButton}
+              onPress={chooseImage}>
+              <Text style={styles.chooseImageText}>Upload file ảnh</Text>
+            </TouchableOpacity>
             <View style={styles.buttonContainer}>
-              <Button title="Đóng" onPress={() => setShowAddDialog(false)} />
-              <Button title="Thêm" onPress={ThemDichVu} />
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowAddDialog(false)}>
+                <Text style={styles.buttonText}>Đóng</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.addButton} onPress={ThemDichVu}>
+                <Text style={styles.buttonText}>Thêm</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -350,21 +586,6 @@ const QuanLyDanhSachDichVu = () => {
 };
 
 const styles = StyleSheet.create({
-  itemContainer: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    borderRadius: 12,
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
   flatListContent: {
     paddingBottom: 80,
   },
@@ -399,6 +620,12 @@ const styles = StyleSheet.create({
   },
   fabStyle: {
     position: 'absolute',
+  },
+  focusedButton: {
+    backgroundColor: '#C8A2C8',
+  },
+  focusedButtonText: {
+    color: '#FFFFFF',
   },
   fabLabel: {
     fontSize: 16,
@@ -511,8 +738,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     alignItems: 'center',
   },
+  addButton: {
+    backgroundColor: '#0e9aa7',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: 10,
+  },
   button: {
-    backgroundColor: '#C8A2C8',
+    backgroundColor: '#cccccc',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
@@ -521,6 +756,116 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  itemImage: {
+    width: 200,
+    height: 200,
+    resizeMode: 'center',
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginHorizontal: 20,
+    marginVertical: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  imageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    resizeMode: 'cover',
+  },
+  contentContainer: {
+    flex: 2,
+    paddingHorizontal: 10,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#251e3e',
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#251e3e',
+    marginTop: 5,
+  },
+  selectedChip: {
+    borderWidth: 2,
+    borderColor: '#0e9aa7',
+    backgroundColor: 'skyblue',
+  },
+  description: {
+    fontSize: 16,
+    marginTop: 5,
+    fontWeight: '600',
+    color: '#03396c',
+  },
+  iconContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  iconButton: {
+    backgroundColor: '#CCCCCC',
+    borderRadius: 20,
+    padding: 8,
+    marginHorizontal: 5,
+  },
+  icon: {
+    fontSize: 20,
+  },
+
+  modalImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    alignSelf: 'center',
+    resizeMode: 'cover',
+    marginBottom: 20,
+  },
+  chooseImageButton: {
+    backgroundColor: '#CCCCCC',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  chooseImageText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: '#051e3e',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
+  },
+  updateButton: {
+    backgroundColor: '#f0e4e4',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    flex: 1,
+    marginLeft: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 });
 
