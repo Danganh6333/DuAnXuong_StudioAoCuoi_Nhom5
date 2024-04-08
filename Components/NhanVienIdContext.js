@@ -10,4 +10,5 @@ export const NhanVienIdContext = ({children}) => {
     </IdContext.Provider>
   );
 };
+
 export const useUserId = () => useContext(IdContext);

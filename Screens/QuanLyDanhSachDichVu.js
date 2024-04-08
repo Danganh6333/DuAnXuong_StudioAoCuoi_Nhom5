@@ -51,7 +51,6 @@ const Item = ({item, toggleUpdateDialog, toggleDeleteDialog}) => (
 const QuanLyDanhSachDichVu = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [acesnding, setacesnding] = useState('');
   const [isExtended, setIsExtended] = React.useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);

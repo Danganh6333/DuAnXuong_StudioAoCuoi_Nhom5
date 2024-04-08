@@ -11,10 +11,11 @@ import QuanLyThongKe from '../Screens/QuanLyThongKe';
 import CustomDrawer from './CustomDrawer';
 import Icon from 'react-native-vector-icons/Ionicons';
 import QuanLyKhachHang from '../Screens/QuanLyKhachHang';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const DrawerNavigation = props => {
   const Drawer = createDrawerNavigator();
-
+  const navigation = useNavigation()
   const handleFocus = (focused, route) => {
     if (focused) {
       switch (route.name) {
@@ -68,7 +69,9 @@ const DrawerNavigation = props => {
           fontFamily: 'Urbanist-VariableFont_wght',
           fontSize: 15,
         },
+        
       }}
+      
       drawerContent={props => <CustomDrawer {...props} />}>
       <Drawer.Screen
         name="Trang Chủ"
@@ -80,6 +83,14 @@ const DrawerNavigation = props => {
               size={size}
               color={color}
             />
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              style={{ marginLeft: 10 }}
+              onPress={() => navigation.navigate('CapNhatThongTin')}
+            >
+              <Icon name="person-outline" size={25} color="black" />
+            </TouchableOpacity>
           ),
         })}
       />

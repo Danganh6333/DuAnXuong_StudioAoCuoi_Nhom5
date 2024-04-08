@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -14,22 +14,23 @@ import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
 import DrawerNavigation from './Components/DrawerNavigation';
 import QuanLyKhachHang from './Screens/QuanLyKhachHang';
+import CapNhatThongTin from './Screens/Access/CapNhatThongTin';
 import {NhanVienIdContext} from './Components/NhanVienIdContext';
 
 const App = () => {
   return (
     <NavigationContainer>
-    <NhanVienIdContext>
-      <Stack />
-    </NhanVienIdContext>
-  </NavigationContainer>
+      <NhanVienIdContext>
+        <Stack />
+      </NhanVienIdContext>
+    </NavigationContainer>
   );
 };
-
 const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
+      <Stack.Screen name="ManHinhChao" component={DangNhap} />
       <Stack.Screen
         name="DangKy"
         component={DangNhap}
@@ -39,18 +40,19 @@ const Stack = () => {
       <Stack.Screen
         name="Drawer"
         component={DrawerNavigation}
-        options={{headerShown: false}}
-      />
+        options={{headerShown: true}
 
+      }
+      />
       <Stack.Screen
         name="ThayDoiMatKhau"
         component={ThayDoiMatKhau}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
-        name="ManHinhChao"
-        component={ManHinhChao}
+        name="CapNhatThongTin"
+        component={CapNhatThongTin}
         options={{headerShown: false}}
       />
 

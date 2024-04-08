@@ -75,9 +75,6 @@ const QuanLyNhanVien = () => {
       return; // Prevent update if required fields are empty
     }
   
-    
-
-    
     const obj = { hoTen, tenNguoiDung, matKhau, email, diaChi, dienThoai, ghiChu };
 
     try {
