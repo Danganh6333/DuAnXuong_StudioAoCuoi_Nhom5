@@ -16,6 +16,7 @@ import DrawerNavigation from './Components/DrawerNavigation';
 import QuanLyKhachHang from './Screens/QuanLyKhachHang';
 import CapNhatThongTin from './Screens/Access/CapNhatThongTin';
 import {NhanVienIdContext} from './Components/NhanVienIdContext';
+import ThongKeTheoThoiGian from './Screens/ThongKeTheoThoiGian';
 
 const App = () => {
   return (
@@ -30,13 +31,13 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="ManHinhChao" component={DangNhap} />
+      <Stack.Screen name="ManHinhChao" component={DangNhap} options={{headerShown:false}} />
       <Stack.Screen
-        name="DangKy"
+        name="DangNhap"
         component={DangNhap}
         options={{headerShown: false}}
       />
-      <Stack.Screen name="DangNhap" component={DangNhap} />
+      <Stack.Screen name="DangKy" component={DangNhap} />
       <Stack.Screen
         name="Drawer"
         component={DrawerNavigation}

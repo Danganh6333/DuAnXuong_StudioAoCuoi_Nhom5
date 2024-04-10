@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Button,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useUserId} from '../../Components/NhanVienIdContext';
@@ -22,21 +23,28 @@ const CapNhatThongTin = () => {
   const [diaChi, setDiaChi] = useState('');
   const [dienThoai, setDienThoai] = useState('');
   const [ghiChu, setGhiChu] = useState('');
-  const [editHoTen, setEditHoTen] = useState('');
-  const [editTenNguoiDung, setEditTenNguoiDung] = useState('');
-  const [editEmail, setEditEmail] = useState('');
-  const [editDiaChi, setEditDiaChi] = useState('');
-  const [editDienThoai, setEditDienThoai] = useState('');
-  const [editGhiChu, setEditGhiChu] = useState('');
   const {userId} = useUserId();
-  const [anhNhanVien, setAnhNhanVien] = useState(null);
+  const [anhNhanVien, setAnhNhanVien] = useState('');
   const chonAnh = useCallback(() => {
     let option = {
       mediaType: 'photo',
-      selectionLimit: 0,
+      selectionLimit: 1,
+      includeBase64: true,
     };
-    ImagePicker.launchImageLibrary(option, setAnhNhanVien);
+    ImagePicker.launchImageLibrary(option, response => {
+      console.log('ImagePicker response:', response); 
+      if (
+        !response.didCancel &&
+        !response.errorCode &&
+        response.assets.length > 0
+      ) {
+        setAnhNhanVien(response.assets[0].uri);
+      } else {
+        console.log('User canceled image picker or encountered an error');
+      }
+    });
   }, []);
+  
   const layThongTin = async () => {
     try {
       const response = await fetch(
@@ -44,6 +52,7 @@ const CapNhatThongTin = () => {
       );
       const json = await response.json();
       setTenNguoiDung(json.data.tenNguoiDung);
+      setAnhNhanVien(json.data.anhNhanVien);
       setEmail(json.data.email);
       setHoTen(json.data.hoTen);
       setDiaChi(json.data.diaChi);
@@ -55,33 +64,60 @@ const CapNhatThongTin = () => {
   };
 
   useEffect(() => {
-    layThongTin();
-  }, []);
+    if (userId) {
+      layThongTin();
+    }
+  }, [userId]);
 
   const updateThongTin = async () => {
-    const updatedItem = {
-      hoTen: editHoTen,
-      tenNguoiDung: editTenNguoiDung,
-      diaChi: editDiaChi,
-      dienThoai: editDienThoai,
-      ghiChu: editGhiChu,
-    };
-    fetch(`http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${userId}`, {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedItem),
-    })
-      .then(response => response.json())
-      .then(data => {
+    try {
+      const formData = new FormData();
+      formData.append('hoTen', hoTen);
+      formData.append('tenNguoiDung', tenNguoiDung);
+      formData.append('diaChi', diaChi);
+      formData.append('dienThoai', dienThoai);
+      formData.append('ghiChu', ghiChu);
+      if (anhNhanVien) {
+        const file = {
+          uri: anhNhanVien,
+          type: 'image/jpeg',
+          name: 'anhNhanVien.jpg',
+        };
+        formData.append('anhNhanVien', file);
+      }
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${userId}`,
+        {
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        },
+      );
+      console.log('Formdata:' + JSON.stringify(formData));
+      if (response.ok) {
+        const data = await response.json();
         console.log('Updated successfully', data);
-      })
-      .catch(error => {
-        console.error('Error updating product:', error);
-      });
+        setHoTen(data.data.hoTen);
+        setTenNguoiDung(data.data.tenNguoiDung);
+        setEmail(data.data.email);
+        setDiaChi(data.data.diaChi);
+        setDienThoai(data.data.dienThoai);
+        setGhiChu(data.data.ghiChu);
+        Alert.alert('Cập Nhật Thành Công');
+        move.navigate('ManHinhChao');
+      } else {
+        console.error('Error updating product:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
   };
+  
+  
+  
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Thông Tin Cá Nhân</Text>
@@ -90,7 +126,7 @@ const CapNhatThongTin = () => {
         onPress={() => chonAnh()}>
         {anhNhanVien ? (
           <Image
-            source={{uri: anhNhanVien.assets[0].uri}}
+            source={{uri: anhNhanVien}}
             style={{width: 90, height: 90, borderRadius: 45}}
           />
         ) : (
@@ -102,39 +138,39 @@ const CapNhatThongTin = () => {
       <TextInput
         style={styles.input}
         value={hoTen}
-        onChangeText={txt => setEditHoTen(txt)}
+        onChangeText={txt => setHoTen(txt)}
         placeholder="Họ Tên"
       />
       <TextInput
         style={styles.input}
         value={tenNguoiDung}
-        onChangeText={txt => setEditTenNguoiDung(txt)}
+        onChangeText={txt => setTenNguoiDung(txt)}
         placeholder="Tên Người Dùng"
       />
       <TextInput
         style={styles.input}
         value={email}
-        onChangeText={txt => setEditEmail(txt)}
+        onChangeText={txt => setEmail(txt)}
         placeholder="Email"
         keyboardType="email-address"
       />
       <TextInput
         style={styles.input}
         value={diaChi}
-        onChangeText={txt => setEditDiaChi(txt)}
+        onChangeText={txt => setDiaChi(txt)}
         placeholder="Địa Chỉ"
       />
       <TextInput
         style={styles.input}
         value={dienThoai}
-        onChangeText={txt => setEditDienThoai(txt)}
+        onChangeText={txt => setDienThoai(txt)}
         placeholder="Điện Thoại"
         keyboardType="phone-pad"
       />
       <TextInput
         style={[styles.input, {height: 100}]}
         value={ghiChu}
-        onChangeText={txt => setEditGhiChu(txt)}
+        onChangeText={txt => setGhiChu(txt)}
         placeholder="Ghi Chú"
         multiline
       />
@@ -167,11 +203,11 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 22, // Adjust this value as needed
+    marginBottom: 22,
   },
   buttonContainer: {
     flex: 1,
-    marginHorizontal: 5, // Adjust this value as needed for spacing between buttons
+    marginHorizontal: 5,
   },
   label: {
     fontSize: 16,

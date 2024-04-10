@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,17 +14,17 @@ import {
   Switch,
   ScrollView,
 } from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
+import { ActivityIndicator } from 'react-native-paper';
 import COMMON from '../COMMON';
-import {AnimatedFAB} from 'react-native-paper';
+import { AnimatedFAB } from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import * as ImagePicker from 'react-native-image-picker';
-import {Chip} from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 
-const Item = ({item, toggleUpdateDialog, toggleDeleteDialog}) => (
+const Item = ({ item, toggleUpdateDialog, toggleDeleteDialog }) => (
   <TouchableOpacity style={styles.itemContainer}>
     <View style={styles.imageContainer}>
-      <Image source={{uri: item.anhDichVu}} style={styles.itemImage} />
+      <Image source={{ uri: item.anhDichVu }} style={styles.itemImage} />
     </View>
     <View style={styles.contentContainer}>
       <Text style={styles.title}>Tên Dịch Vụ {item.tenDichVu}</Text>
@@ -63,14 +63,14 @@ const QuanLyDanhSachDichVu = () => {
   const [updateLoaiDichVu, setUpdateLoaiDichVu] = useState(0);
   const [giaTien, setGiaTien] = useState('');
   const [updateAnhDichVu, setUpdateAnhDichVu] = useState('');
-  const [loaiDichVu, setloaiDichVu] = useState(0)
+  const [loaiDichVu, setLoaiDichVu] = useState(0)
   const [anhDichVu, setAnhDichVu] = useState('');
   const [updateTenDichVu, setUpdateTenDichVu] = useState('');
   const [updateTrangThai, setUpdateTrangThai] = useState(0);
   const [updateMoTa, setUpdateMoTa] = useState('');
   const [isEnabled, setIsEnabled] = useState(false);
   const [selectedServiceType, setSelectedServiceType] = useState(null);
-
+  const [updateHoanThanh, setupdateHoanThanh] = useState('')
   const [updateGiaTien, setUpdateGiaTien] = useState('');
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [focusedButton, setFocusedButton] = useState(null);
@@ -93,7 +93,7 @@ const QuanLyDanhSachDichVu = () => {
     getDanhSachDichVu();
   }, []);
 
-  const onScroll = ({nativeEvent}) => {
+  const onScroll = ({ nativeEvent }) => {
     const currentScrollPosition =
       Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
     setIsExtended(currentScrollPosition <= 0);
@@ -103,7 +103,7 @@ const QuanLyDanhSachDichVu = () => {
     try {
       const response = await fetch(
         `http://${COMMON.ipv4}:3000/dichvus/deleteDichVu/${selectedItemId}`,
-        {method: 'DELETE'},
+        { method: 'DELETE' },
       );
       if (response.ok) {
         Alert.alert('Xóa thành công');
@@ -156,6 +156,44 @@ const QuanLyDanhSachDichVu = () => {
       }
     });
   }, []);
+  const CapNhatDichVu = () => {
+    let formData = new FormData();
+    formData.append('tenDichVu', updateTenDichVu);
+    formData.append('trangThai', updateTrangThai);
+    formData.append('loaiDichVu', updateLoaiDichVu);
+    formData.append('moTa', updateMoTa);
+    formData.append('giaTien', updateGiaTien);
+    formData.append('anhDichVu', {
+      uri: updateAnhDichVu,
+      type: 'image/jpeg',
+      name: 'anhDichVu.jpg',
+    });
+
+    fetch(
+      `http://${COMMON.ipv4}:3000/dichvus/updateDichVu/${selectedItemId}`,
+      {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          Alert.alert('Cập nhật thành công');
+          setShowUpdateDialog(false);
+          getDanhSachDichVu();
+        } else {
+          Alert.alert('Cập nhật không thành công');
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating service:', error);
+        Alert.alert('Cập nhật không thành công');
+      });
+  };
   const ThemDichVu = () => {
     let url_api_add = `http://${COMMON.ipv4}:3000/dichvus/addDichVuWithImage`;
     let formData = new FormData();
@@ -188,72 +226,7 @@ const QuanLyDanhSachDichVu = () => {
       .catch(err => {
         console.log('Lỗi Thêm Dịch Vụ', err);
       });
-  };
-
-  const CapNhatDichVu = () => {
-    const updatedItem = {
-      tenDichVu: updateTenDichVu,
-      trangThai: updateTrangThai,
-      moTa: updateMoTa,
-      giaTien: updateGiaTien,
-    };
-    let options = {
-      mediaType: 'photo',
-      selectionLimit: 1,
-      includeBase64: true,
-    };
-
-    ImagePicker.launchImageLibrary(options, response => {
-      if (
-        !response.didCancel &&
-        !response.errorCode &&
-        response.assets.length > 0
-      ) {
-        const imageData = response.assets[0];
-        const formData = new FormData();
-        formData.append('image', {
-          uri: imageData.uri,
-          type: imageData.type,
-          name: imageData.fileName,
-        });
-
-        fetch(`http://${COMMON.ipv4}:3000/uploadImage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        })
-          .then(response => response.json())
-          .then(imageResponse => {
-            updatedItem.anhDichVu = imageResponse.imageUrl;
-            fetch(
-              `http://${COMMON.ipv4}:3000/dichvus/updateDichVu/${selectedItemId}`,
-              {
-                method: 'PUT',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedItem),
-              },
-            )
-              .then(response => response.json())
-              .then(data => {
-                console.log('Updated successfully', data);
-                setShowUpdateDialog(false);
-                getDanhSachDichVu();
-              })
-              .catch(error => {
-                console.error('Error updating service:', error);
-              });
-          })
-          .catch(error => {
-            console.error('Error uploading image:', error);
-          });
-      }
-    });
-  };
+  }
 
   const toggleAddDialog = value => {
     setShowAddDialog(value);
@@ -314,14 +287,14 @@ const QuanLyDanhSachDichVu = () => {
   //   searchByPriceRange(startPrice, endPrice);
   //   setFocusedButton({ startPrice, endPrice });
   // };
-  const fabStyle = {right: 16, bottom: 16};
+  const fabStyle = { right: 16, bottom: 16 };
   return (
-    <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
+    <View style={{ flex: 1, marginTop: StatusBar.currentHeight || 0 }}>
       <View style={styles.buttonGroup}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={true}
-          style={{height: 38}}>
+          style={{ height: 38 }}>
           <TouchableOpacity
             style={[
               styles.button,
@@ -340,16 +313,35 @@ const QuanLyDanhSachDichVu = () => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button]}
-            onPress={() => setSelectedServiceType(0)}>
-            <Text style={[styles.buttonText]}>Dịch Vụ Đơn</Text>
+            style={[styles.button, focusedButton === 0 && styles.focusedButton]}
+            onPress={() => {
+              setSelectedServiceType(0);
+              setFocusedButton(0);
+            }}>
+            <Text
+              style={[
+                styles.buttonText,
+                focusedButton === 0 && styles.focusedButtonText,
+              ]}>
+              Dịch Vụ Đơn
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button]}
-            onPress={() => setSelectedServiceType(1)}>
-            <Text style={[styles.buttonText]}>Dịch Vụ Theo Gói</Text>
+            style={[styles.button, focusedButton === 1 && styles.focusedButton]}
+            onPress={() => {
+              setSelectedServiceType(1);
+              setFocusedButton(1);
+            }}>
+            <Text
+              style={[
+                styles.buttonText,
+                focusedButton === 1 && styles.focusedButtonText,
+              ]}>
+              Dịch Vụ Theo Gói
+            </Text>
           </TouchableOpacity>
         </ScrollView>
+
       </View>
       {loading ? (
         <ActivityIndicator animating={true} color="#2aa198" />
@@ -357,7 +349,7 @@ const QuanLyDanhSachDichVu = () => {
         <FlatList
           data={data}
           onScroll={onScroll}
-          renderItem={({item}) => (
+          renderItem={({ item }) => (
             <Item
               item={item}
               toggleAddDialog={toggleAddDialog}
@@ -391,7 +383,7 @@ const QuanLyDanhSachDichVu = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Sửa Dịch Vụ</Text>
-            <Image source={{uri: updateAnhDichVu}} style={styles.modalImage} />
+            <Image source={{ uri: updateAnhDichVu }} style={styles.modalImage} />
             <TextInput
               style={styles.input}
               placeholder="Tên Dịch Vụ"
@@ -414,7 +406,7 @@ const QuanLyDanhSachDichVu = () => {
             <View style={styles.switchContainer}>
               <Text style={styles.switchLabel}>Trạng Thái</Text>
               <Switch
-                trackColor={{false: '#767577', true: '#81b0ff'}}
+                trackColor={{ false: '#767577', true: '#81b0ff' }}
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
                 value={isEnabled}
                 onValueChange={value => {
@@ -476,7 +468,7 @@ const QuanLyDanhSachDichVu = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Thêm Dịch Vụ Mới</Text>
             {anhDichVu && (
-              <Image source={{uri: anhDichVu}} style={styles.modalImage} />
+              <Image source={{ uri: anhDichVu }} style={styles.modalImage} />
             )}
             <TextInput
               style={styles.input}
@@ -497,7 +489,7 @@ const QuanLyDanhSachDichVu = () => {
             <View style={styles.switchContainer}>
               <Text style={styles.switchLabel}>Trạng Thái</Text>
               <Switch
-                trackColor={{false: '#767577', true: '#81b0ff'}}
+                trackColor={{ false: '#767577', true: '#81b0ff' }}
                 thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
                 value={isEnabled}
                 onValueChange={value => {
@@ -770,7 +762,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,

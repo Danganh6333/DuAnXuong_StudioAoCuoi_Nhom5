@@ -12,37 +12,62 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { AnimatedFAB } from 'react-native-paper';
-import { Picker } from '@react-native-picker/picker';
+import React, {useEffect, useState} from 'react';
+import {AnimatedFAB} from 'react-native-paper';
+import {Picker} from '@react-native-picker/picker';
 import moment from 'moment';
 import COMMON from '../COMMON';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useUserId } from '../Components/NhanVienIdContext';
+import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {useUserId} from '../Components/NhanVienIdContext';
 
 const QuanLyHoaDon = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [khachHangData, setKhachHangData] = useState([]);
-  const [khachHangHoTen, setKhachHangHoTen] = useState('');
   const [nhanVienData, setNhanVienData] = useState([]);
   const [dichVuData, setDichVuData] = useState([]);
-  const [nhanVienHoTen, setNhanVienHoTen] = useState('');
   const [tenDichVu, setTenDichVu] = useState('');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [isExtended, setIsExtended] = useState(true);
   const [currentDate, setCurrentDate] = useState('');
   const [selectedDichVus, setSelectedDichVus] = useState([]);
-  const { userId } = useUserId();
+  const {userId} = useUserId();
   const [idNhanVien, setIdNhanVien] = useState('');
   const [idKhachHang, setIdKhachHang] = useState('');
   const [tongTien, setTongTien] = useState(0);
   const [hoaDonName, setHoaDonName] = useState('');
   const [showDetail, setShowDetail] = useState(false);
   const [selectedDichVuDetails, setSelectedDichVuDetails] = useState([]);
-  const [vaiTro, setvaiTro] = useState(null)
   const [selectedHoaDon, setSelectedHoaDon] = useState(null);
-  const [testData, settestData] = useState(null)
+  const [showUpdateCompleteDialog, setShowUpdateCompleteDialog] =
+    useState(false);
+
+  const toggleUpdateCompleteDialog = () => {
+    setShowUpdateCompleteDialog(!showUpdateCompleteDialog);
+  };
+
+  const updateTrangThai = async (hoaDonId, idDichVu, newTrangThai) => {
+    try {
+      const url = `http://${COMMON.ipv4}:3000/hoadons/updateHoaDon/${hoaDonId}`;
+      console.log('yssss' + hoaDonId);
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({idDichVu, trangThai: newTrangThai}),
+      });
+
+      if (response.ok) {
+        console.log('Trạng thái đã được cập nhật thành công');
+      } else {
+        console.error('Lỗi khi cập nhật trạng thái');
+      }
+    } catch (error) {
+      console.error('Lỗi khi gửi yêu cầu cập nhật trạng thái:', error);
+    }
+  };
   const calculateTotalTongTien = () => {
     let total = 0;
     selectedDichVus.forEach(dichVu => {
@@ -56,7 +81,7 @@ const QuanLyHoaDon = () => {
     setTongTien(totalTongTien);
   };
 
-  const onScroll = ({ nativeEvent }) => {
+  const onScroll = ({nativeEvent}) => {
     const currentScrollPosition =
       Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
     setIsExtended(currentScrollPosition <= 0);
@@ -66,7 +91,7 @@ const QuanLyHoaDon = () => {
     setShowAddDialog(value);
   };
 
-  const fabStyle = { right: 10, bottom: 2 };
+  const fabStyle = {right: 10, bottom: 2};
 
   const getSpinnerKhachHang = async () => {
     try {
@@ -116,13 +141,35 @@ const QuanLyHoaDon = () => {
       setLoading(false);
     }
   };
-  
-  
+
   const getCurrentDate = () => {
     var date = moment().utcOffset('+07:00').format('YYYY-MM-DD HH:mm:ss');
     setCurrentDate(date);
   };
-  
+  const updateHoaDon = async item => {
+    try {
+      const response = await fetch(
+        `http://${COMMON.ipv4}:3000/hoadons/updateHoanThanhHoaDon/${item}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hoanThanh: 1,
+          }),
+        },
+      );
+      if (response.ok) {
+        console.log('HoaDon updated successfully');
+      } else {
+        console.error('Failed to update HoaDon');
+      }
+    } catch (error) {
+      console.error('Error updating HoaDon:', error);
+    }
+  };
+
   const addHoaDon = async () => {
     let url_api_add = `http://${COMMON.ipv4}:3000/hoadons/addHoaDon`;
     let obj = {
@@ -176,20 +223,18 @@ const QuanLyHoaDon = () => {
     updatedSelectedDichVus.splice(index, 1);
     setSelectedDichVus(updatedSelectedDichVus);
   };
-  const showHoaDon = async (item) => {
+  const showHoaDon = async item => {
     try {
       let url_api_add = `http://${COMMON.ipv4}:3000/hoadons/searchHoaDon/${item._id}`;
       const response = await fetch(url_api_add);
       const json = await response.json();
-      console.log('SSSSSSSSSSSSSSSSS', JSON.stringify(json));
       setSelectedDichVuDetails(json.data.idDichVus);
       console.log(json.data.idDichVus);
       const formattedNgayTao = moment(json.data.ngayTao).format('YYYY-MM-DD');
-  
-      setSelectedHoaDon({ ...item, ngayTao: formattedNgayTao });
+      setSelectedHoaDon({...item, ngayTao: formattedNgayTao});
       if (selectedHoaDon && selectedHoaDon.idDichVus) {
         console.log('idDichVus:');
-        selectedHoaDon.idDichVus.forEach((dichVuItem) => {
+        selectedHoaDon.idDichVus.forEach(dichVuItem => {
           console.log(dichVuItem.idDichVu);
         });
       }
@@ -198,18 +243,19 @@ const QuanLyHoaDon = () => {
       console.error(error);
     }
   };
-  
 
   return (
-    <View style={{ flex: 1, marginTop: StatusBar.currentHeight || 0 }}>
+    <View style={{flex: 1, marginTop: StatusBar.currentHeight || 0}}>
       {loading ? (
         <ActivityIndicator size="large" color="#ff6f61" />
       ) : (
         <FlatList
           data={data}
           onScroll={onScroll}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.ItemContainer} onPress={() => showHoaDon(item)}>
+          renderItem={({item}) => (
+            <TouchableOpacity
+              style={styles.ItemContainer}
+              onPress={() => showHoaDon(item)}>
               <View style={styles.content}>
                 <Text style={styles.customerName}>
                   Khách hàng: {item.idKhachHang.hoTen}
@@ -217,7 +263,9 @@ const QuanLyHoaDon = () => {
                 <Text style={styles.employeeName}>
                   Nhân viên: {item.idNhanVien.hoTen}
                 </Text>
-                <Text style={styles.date}>Ngày tạo: {moment(item.ngayTao).format('DD-MM-YYYY')}</Text>
+                <Text style={styles.date}>
+                  Ngày tạo: {moment(item.ngayTao).format('DD-MM-YYYY')}
+                </Text>
                 <Text style={styles.total}>
                   Tổng tiền:{' '}
                   {item.tongTien.toLocaleString('vi-VN', {
@@ -293,7 +341,7 @@ const QuanLyHoaDon = () => {
                       };
                       setSelectedDichVus(prevState => [...prevState, newItem]);
                     } else {
-                      Alert.alert('This Dịch Vụ is already selected');
+                      Alert.alert('Dịch Vụ Đã Được Chọn');
                     }
                   }
                 }}>
@@ -365,8 +413,29 @@ const QuanLyHoaDon = () => {
                       <View key={index} style={styles.selectedDichVuItem}>
                         {dichVu && (
                           <>
-                            <Text style={styles.dichVuName}>Tên dịch vụ: {dichVu.tenDichVu}</Text>
-                            <Text style={styles.dichVuPrice}>Giá tiền: {dichVu.giaTien}</Text>
+                            <BouncyCheckbox
+                              size={25}
+                              fillColor="red"
+                              unFillColor="#FFFFFF"
+                              iconStyle={{borderColor: 'red'}}
+                              innerIconStyle={{borderWidth: 2}}
+                              isChecked={dichVuItem.trangThai === 1}
+                              onPress={isChecked => {
+                                if (selectedHoaDon.hoanThanh !== 1) {
+                                  updateTrangThai(
+                                    selectedHoaDon._id,
+                                    dichVuItem._id,
+                                    isChecked ? 1 : 0,
+                                  );
+                                }
+                              }}
+                            />
+                            <Text style={styles.dichVuName}>
+                              Tên dịch vụ: {dichVu.tenDichVu}
+                            </Text>
+                            <Text style={styles.dichVuPrice}>
+                              Giá tiền: {dichVu.giaTien}
+                            </Text>
                           </>
                         )}
                       </View>
@@ -374,9 +443,41 @@ const QuanLyHoaDon = () => {
                   })}
               </>
             )}
-            <TouchableOpacity style={styles.closeButton} onPress={() => setShowDetail(false)}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowDetail(false)}>
               <Text style={styles.closeButtonText}>Đóng</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.completedButton}
+              onPress={toggleUpdateCompleteDialog}
+              disabled={selectedHoaDon && selectedHoaDon.hoanThanh === 1}>
+              <Text style={styles.closeButtonText}>Xác Nhận Hoàn Thành</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        visible={showUpdateCompleteDialog}
+        transparent={true}
+        animationType="slide">
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Xác Nhận Hoàn Thành Hóa Đơn</Text>
+            <Text style={styles.info}>Bạn có chắc muốn cập nhật hóa đơn?</Text>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Xác Nhận"
+                onPress={() => {
+                  toggleUpdateCompleteDialog();
+                  if (selectedHoaDon) {
+                    updateHoaDon(selectedHoaDon._id);
+                    console.log(selectedHoaDon._id);
+                  }
+                }}
+              />
+              <Button title="Hủy" onPress={toggleUpdateCompleteDialog} />
+            </View>
           </View>
         </View>
       </Modal>
@@ -389,6 +490,12 @@ export default QuanLyHoaDon;
 const styles = StyleSheet.create({
   closeButton: {
     backgroundColor: '#ff6f61',
+    borderRadius: 5,
+    paddingVertical: 10,
+    marginTop: 20,
+  },
+  completedButton: {
+    backgroundColor: '#42D2F2',
     borderRadius: 5,
     paddingVertical: 10,
     marginTop: 20,

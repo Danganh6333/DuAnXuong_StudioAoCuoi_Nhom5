@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, StyleSheet, Text, View, Image, ScrollView, Pressable, FlatList, Alert } from 'react-native'
 import axios from 'axios';
 import { Swipeable } from 'react-native-gesture-handler';
 import CustomTextInput from '../Components/CustomTextInput';
 import Button from '../Components/Button';
 import COMMON from '../COMMON';
-import * as ImagePicker from 'react-native-image-picker';
 const QuanLyNhanVien = () => {
 
   const [nhanVien, setNhanVien] = useState([]);
@@ -16,10 +15,8 @@ const QuanLyNhanVien = () => {
   const [modalVisible_delenv, setModalVisible_Delenv] = useState(false);
   const [modalVisible_isempty, setModalVisible_Isempty] = useState(false);
   const [yes, setYes] = useState(false);
-  const [anhNguoiDung, setAnhNguoiDung] = useState('')
   const [no, setNo] = useState(false);
   const [_id, set_id] = useState('')
-  const [anhNhanVien, setAnhNhanVien] = useState(null)
   const [hoTen, setHoTen] = useState('')
   const [email, setEmail] = useState('');
   const [tenNguoiDung, setTenNguoiDung] = useState('nhanvien01');
@@ -36,25 +33,6 @@ const QuanLyNhanVien = () => {
     const regex = /^\d{10}$/;
     return regex.test(dienThoai);
   };
-  const chooseImage = useCallback(() => {
-    let options = {
-      mediaType: 'photo',
-      selectionLimit: 1,
-      includeBase64: true,
-    };
-
-    ImagePicker.launchImageLibrary(options, response => {
-      if (
-        !response.didCancel &&
-        !response.errorCode &&
-        response.assets.length > 0
-      ) {
-        setAnhNhanVien(response.assets[0].uri);
-      } else {
-        console.log('User canceled image picker or encountered an error');
-      }
-    });
-  }, []);
   const getList_nv = async () => {
     try {
       const response = await axios.get(`http://${COMMON.ipv4}:3000/nhanviens/getNhanVien`);
@@ -67,31 +45,30 @@ const QuanLyNhanVien = () => {
     getList_nv()
   }, []);
 
-  // const putList_nv = async () => {
-  //   let id = _id; // Use the stored ID for the update request
-  //   if (!isValidEmail(email)) {
-  //     Alert.alert('Email không hợp lệ!');
-  //     return;
-  //   }
-  //   else if(!isValidDienThoai(dienThoai)){
-  //     Alert.alert('Số diện thoại không hợp lệ!');
-  //     return;
-   
-  //   }
-  //   if (!id || !hoTen || !email || !diaChi || !dienThoai) {
-  //     setModalVisible_Isempty(true)
-  //     return; // Prevent update if required fields are empty
-  //   }
-  //   const obj = { hoTen, email, diaChi, dienThoai, ghiChu };
-  //   try {
-  //     await axios.put(`http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${id}`, obj);
-  //     getList_nv(); // Refetch employee list after successful update
-  //     setModalVisible_editnv(false); // Close edit modal
-  //   } catch (error) {
-  //     console.error(error);
-  //     Alert.alert('Lỗi!', 'Có lỗi xảy ra khi sửa nhân viên!'); // Inform user about update error
-  //   }
-  // };
+  const putList_nv = async () => {
+    let id = _id; // Use the stored ID for the update request
+    if (!isValidEmail(email)) {
+      Alert.alert('Email không hợp lệ!');
+      return;
+    }
+    else if(!isValidDienThoai(dienThoai)){
+      Alert.alert('Số diện thoại không hợp lệ!');
+      return;
+    }
+    if (!id || !hoTen || !email || !diaChi || !dienThoai) {
+      setModalVisible_Isempty(true)
+      return; // Prevent update if required fields are empty
+    }
+    const obj = { hoTen, email , diaChi, dienThoai, ghiChu };
+    try {
+      await axios.put(`http://${COMMON.ipv4}:3000/nhanviens/updateNhanVien/${id}`, obj);
+      getList_nv(); // Refetch employee list after successful update
+      setModalVisible_editnv(false); // Close edit modal
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Lỗi!', 'Có lỗi xảy ra khi sửa nhân viên!'); // Inform user about update error
+    }
+  };
   const postList_nv = async () => {
     if (!hoTen || !email || !diaChi || !dienThoai) {
       setModalVisible_Isempty(true);
@@ -134,21 +111,25 @@ const QuanLyNhanVien = () => {
     }
   };
   const renderItem = ({ item }) => {
+
     return (
       <Pressable onPress={() => {
         setModalVisible_ctnv(true);
         setNhanVien_id(item);
       }}>
-        <View style={styles.listItemContainer}>
-          <View style={styles.profileContainer}>
-            <Image style={styles.profileImage} source={require('../img/user.png')} />
-            <View style={styles.textContainer}>
-              <Text style={styles.nameText}>{item.hoTen}</Text>
-              <Text style={styles.emailText}>{item.email}</Text>
-            </View>
+        <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
+        </View>
+        <View style={{ backgroundColor: '#fff', height: 80, alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-start' }}>
+        <View style={{width:'15%'}}>
+            <Image style={{ width: 35, height: 35, tintColor: '#70cbff' }} source={require('../img/user.png')} />
+        
+        </View>
+          <View style={{width:'65%'}}>
+            <Text style={{ color: 'black' }}>{item.hoTen}</Text>
+            <Text style={{ color: 'black' }}>{item.email}</Text>
           </View>
-          <View style={styles.actionContainer}>
-            {/* <Pressable onPress={() => {
+          <View style={{ flexDirection: 'row', }}>
+            <Pressable onPress={() => {
               setModalVisible_editnv(true)
               set_id(item._id)
               setHoTen(item.hoTen);
@@ -157,18 +138,22 @@ const QuanLyNhanVien = () => {
               setDienThoai(item.dienThoai)
               setGhiChu(item.ghiChu)
             }}>
-              <Image style={styles.actionIcon} source={require('../img/edit.png')} />
-            </Pressable> */}
-            <Pressable onPress={() => {
-              setModalVisible_Delenv(true)
-              set_id(item._id)
-            }}>
-              <Image style={styles.actionIcon} source={require('../img/trash.png')} />
+              <Image style={{ width: 35, height: 35, tintColor: '#70cbff' }} source={require('../img/edit.png')} />
             </Pressable>
+            <Pressable onPress={() =>{
+             setModalVisible_Delenv(true)
+             set_id(item._id)
+             }     }>
+              <Image style={{ width: 35, height: 35, tintColor: 'red' }} source={require('../img/trash.png')} />
+            </Pressable>
+            
           </View>
         </View>
+        <View style={{ height: 5, backgroundColor: '#A1A1A1' }}>
+        </View>
       </Pressable>
-    );
+
+    )
   };
   return (
     <View style={{ flex: 1 }}>
@@ -188,8 +173,8 @@ const QuanLyNhanVien = () => {
 
       {/* Box 3 (Add employee button) */}
       <Pressable onPress={() => setModalVisible_addnv(true)}>
-        <View style={styles.addButtonContainer}>
-          <Image style={styles.addButtonImage} source={require('../img/add.png')} />
+        <View style={{ position: 'absolute', bottom: 5, right: 5 }}>
+          <Image style={{ width: 40, height: 40 }} source={require('../img/add.png')} />
         </View>
       </Pressable>
       {/* Modal chi tiết */}
@@ -227,7 +212,7 @@ const QuanLyNhanVien = () => {
         </View>
       </Modal>
       {/* Modal sửa */}
-      {/* <Modal
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible_editnv}>
@@ -272,59 +257,50 @@ const QuanLyNhanVien = () => {
             </Pressable>
           </View>
         </View>
-      </Modal> */}
+      </Modal>
       {/* Modal thêm */}
       <Modal
-  animationType="slide"
-  transparent={true}
-  visible={modalVisible_addnv}
->
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible_addnv} >
 
-  <View style={{ flex: 0.8, margin: '15%', borderRadius: 30, backgroundColor: '#70cbff' }}>
-    <View style={{ padding: '8%' }}>
-      <Text style={{ margin: '5%', fontSize: 22, color: 'black', fontWeight: 'bold', textAlign: 'center' }}>Thêm nhân viên</Text>
-      {/* Image Picker */}
-      <Pressable onPress={chooseImage}>
-        <Image source={anhNhanVien ? { uri: anhNhanVien } : " "} style={styles.imagePicker} />
-      </Pressable>
-      {/* Custom Text Inputs */}
-      <CustomTextInput
-        placeholder="Tên nhân viên"
-        onChangeText={(txt) => setHoTen(txt)}
-      />
-      <CustomTextInput
-        placeholder="Email"
-        onChangeText={(txt) => setEmail(txt)}
-      />
-      <CustomTextInput
-        placeholder="Tên địa chỉ"
-        onChangeText={(txt) => setDiaChi(txt)}
-      />
-      <CustomTextInput
-        placeholder="Số điện thoại"
-        onChangeText={(txt) => setDienThoai(txt)}
-      />
-      <CustomTextInput
-        placeholder="Ghi chú"
-        onChangeText={(txt) => setGhiChu(txt)}
-      />
-      {/* Button */}
-      <Button onPress={postList_nv} />
-    </View>
+        <View style={{ flex: 0.8, margin: '15%', borderRadius: 30, backgroundColor: '#70cbff' }}>
+          <View style={{ padding: '8%' }}>
+            <Text style={{ margin: '5%', fontSize: 22, color: 'black', fontWeight: 'bold', textAlign: 'center' }}>Thêm nhân viên</Text>
+            <CustomTextInput
+              placeholder="Tên nhân viên"
+              onChangeText={(txt) => setHoTen(txt)}
+            />
+            <CustomTextInput
+              placeholder="Email"
+              onChangeText={(txt) => setEmail(txt)}
+            />
+            <CustomTextInput
+              placeholder="Tên địa chỉ"
+              onChangeText={(txt) => setDiaChi(txt)}
+            />
+            <CustomTextInput
+              placeholder="Số điện thoại"
+              onChangeText={(txt) => setDienThoai(txt)}
+            />
+            <CustomTextInput
+              placeholder="Ghi chú"
+              onChangeText={(txt) => setGhiChu(txt)}
+            />
+          </View>
 
-    {/* Close and Add Buttons */}
-    <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around', alignItems: 'center', }}>
-      <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={() => setModalVisible_addnv(false)}>
-        <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
-      </Pressable>
-      <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={postList_nv}>
-        <Text style={{ color: 'black', textAlign: 'center' }}>Thêm</Text>
-      </Pressable>
-    </View>
-  </View>
+          <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around', alignItems: 'center', }}>
+            <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={() => setModalVisible_addnv(false)}>
 
-</Modal>
+              <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
+            </Pressable>
+            <Pressable style={{ width: 100, height: 50, backgroundColor: '#B0A4A8', justifyContent: 'center', borderRadius: 25, alignItems: 'center' }} onPress={postList_nv}>
 
+              <Text style={{ color: 'black', textAlign: 'center' }}>Thêm</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <Modal
         //    animationType="slide"
         transparent={true}
@@ -441,57 +417,4 @@ const QuanLyNhanVien = () => {
 
 export default QuanLyNhanVien;
 
-const styles = StyleSheet.create({
-  listItemContainer: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#A1A1A1',
-  },
-  profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 35,
-    height: 35,
-    tintColor: '#70cbff',
-  },
-  textContainer: {
-    marginLeft: 12,
-  },
-  nameText: {
-    color: 'black',
-    fontSize: 16,
-  },
-  emailText: {
-    color: 'black',
-    fontSize: 14,
-  },
-  actionContainer: {
-    flexDirection: 'row',
-  },
-  actionIcon: {
-    width: 35,
-    height: 35,
-    tintColor: '#70cbff',
-    marginLeft: 16,
-  },
-  addButtonContainer: {
-    position: 'absolute',
-    bottom: 5,
-    right: 5,
-    backgroundColor: '#70cbff',
-    borderRadius: 20,
-    padding: 10,
-  },
-  addButtonImage: {
-    width: 40,
-    height: 40,
-  },
-});
-
+const styles = StyleSheet.create({});
