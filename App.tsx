@@ -30,7 +30,7 @@ const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-      <Stack.Screen name="ManHinhChao" component={DangNhap} />
+      <Stack.Screen name="ManHinhChao" component={QuanLyThongKe} />
       <Stack.Screen
         name="DangKy"
         component={DangNhap}

@@ -418,23 +418,8 @@ console.log("id"+userId);
             <View
               style={st.Modal_sua_View2}>
               <Pressable onPress={() => showMode('date')}>
-                <View
-                  style={{
-                    width: 90,
-                    borderRadius: 20,
-                    height: 40,
-                    padding: '5%',
-                    justifyContent: 'center',
-                    backgroundColor: '#BF9191',
-                  }}>
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      color: '#fff',
-                      fontWeight: 'bold',
-                    }}>
-                    Từ Ngày
-                  </Text>
+                <View  style={st.Modal_sua_View3}>
+                  <Text style={st.renderItem_Text1}>Từ Ngày</Text>
                 </View>
               </Pressable>
               <Text style={{ width: 72 }}>{ngayBatDau}</Text>
@@ -449,31 +434,11 @@ console.log("id"+userId);
               )}
             </View>
             <View
-              style={{
-                alignItems: 'center',
-                height: 50,
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-              }}>
+              style={st.Modal_sua_View2}>
               <Text style={{ width: 72 }}>{ngayKetThuc}</Text>
               <Pressable onPress={() => showMode('date')}>
-                <View
-                  style={{
-                    width: 90,
-                    borderRadius: 20,
-                    height: 40,
-                    padding: '5%',
-                    justifyContent: 'center',
-                    backgroundColor: '#DAAE7B',
-                  }}>
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      color: '#fff',
-                      fontWeight: 'bold',
-                    }}>
-                    Đến Ngày
-                  </Text>
+                <View style={  st.Modal_them_View2  }>
+                  <Text  style={st.renderItem_Text1}> Đến Ngày </Text>
                 </View>
               </Pressable>
               {show && (
@@ -490,23 +455,10 @@ console.log("id"+userId);
               placeholder="Tên nhân viên"
               onChangeText={txt => setNoiDungCongViec(txt)}
               value={noiDungCongViec}
-              style={{
-                backgroundColor: '#FFF',
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 10,
-                borderColor: '#C0C0C0',
-                borderWidth: 1,
-                height: 100,
-              }}
+              style={st.Modal_sua_TextInput1}
             />
           </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 20,
-            }}>
+          <View  style={    st.Modal_sua_View4 }>
             <CheckBox
               style={{ marginLeft: 30 }}
               value={trangThai === 1}
@@ -522,33 +474,15 @@ console.log("id"+userId);
             </Text>
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-            }}>
+          <View style={st.Modal_sua_View4}>
             <Pressable
-              style={{
-                width: 100,
-                height: 50,
-                backgroundColor: '#B0A4A8',
-                justifyContent: 'center',
-                borderRadius: 25,
-                alignItems: 'center',
-              }}
+              style={st.Modal_sua_Press1}
               onPress={() => setModalVisible_editcv(false)}>
               <Text style={{ color: 'black', textAlign: 'center' }}>Đóng</Text>
             </Pressable>
             <Pressable
               style={{
-                width: 100,
-                height: 50,
-                backgroundColor: '#B0A4A8',
-                justifyContent: 'center',
-                borderRadius: 25,
-                alignItems: 'center',
+              vv
               }}
               onPress={putList_nv}>
               <Text style={{ color: 'black', textAlign: 'center' }}>Thêm</Text>
@@ -891,6 +825,7 @@ const st = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#BF9191',
   },
+ 
   renderItem_Text1:{
     textAlign: 'center',
     color: '#fff',
@@ -923,6 +858,7 @@ Modal_them_View2:{
   padding: '5%',
   justifyContent: 'center',
   backgroundColor: '#BF9191',
+  
 },
 Modal_them_Text2:{
   textAlign: 'center',
@@ -979,5 +915,40 @@ Modal_sua_View2:{
   height: 50,
   flexDirection: 'row',
   justifyContent: 'space-around',
-}
+},
+Modal_sua_View3:{
+  width: 90,
+  borderRadius: 20,
+  height: 40,
+  padding: '5%',
+  justifyContent: 'center',
+  backgroundColor: '#BF9191',
+},
+Modal_sua_TextInput1:{
+  backgroundColor: '#FFF',
+  borderRadius: 10,
+  padding: 10,
+  marginBottom: 10,
+  borderColor: '#C0C0C0',
+  borderWidth: 1,
+  height: 100,
+},
+Modal_sua_View4:{flexDirection: 'row',
+alignItems: 'center',
+marginBottom: 20,},
+
+Modal_sua_Press1:{
+  width: 100,
+  height: 50,
+ backgroundColor: '#B0A4A8',
+ justifyContent: 'center',
+ borderRadius: 25,
+ alignItems: 'center',
+},
+width: 100,
+height: 50,
+backgroundColor: '#B0A4A8',
+justifyContent: 'center',
+borderRadius: 25,
+alignItems: 'center',
 });
