@@ -12,6 +12,7 @@ import axios from 'axios';
 import SignIn_TextInput from '../../Components/SignUp_TextInput';
 import {useNavigation} from '@react-navigation/native';
 import isEmail from 'validator/lib/isEmail';
+import COMMON from '../../COMMON';
 
 const DangKy = () => {
   const [username, setUsername] = useState('');
@@ -22,7 +23,7 @@ const DangKy = () => {
   const checkEmailExists = async email => {
     try {
       const response = await axios.get(
-        `http://192.168.1.139:3000/nguoidungs/check/${email}`,
+        `http://${COMMON.ipv4}:3000/nguoidungs/check/${email}`,
       );
       return response.data.exists;
     } catch (error) {
@@ -59,7 +60,7 @@ const DangKy = () => {
     } else {
       try {
         const response = await axios.post(
-          'http://192.168.1.139:3000/nguoidungs/reg',
+          `http://${COMMON.ipv4}:3000/nguoidungs/reg`,
           {
             username,
             password,
@@ -67,7 +68,7 @@ const DangKy = () => {
           },
         );
         console.log('Signup successful:', response.data);
-        navigate.navigate('DangNhap');
+        navigate.navigate('Drawer');
       } catch (error) {
         console.error('Signup failed:', error);
         Alert.alert('Signup failed. Please try again.');

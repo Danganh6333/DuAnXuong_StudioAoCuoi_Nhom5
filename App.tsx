@@ -1,9 +1,8 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import ManHinhChao from './Screens/ManHinhChao';
-import {createDrawerNavigator} from '@react-navigation/drawer';
 import DangNhap from './Screens/Access/DangNhap';
 import DangKy from './Screens/Access/DangKy';
 import ThayDoiMatKhau from './Screens/Access/ThayDoiMatKhau';
@@ -13,58 +12,47 @@ import TrangChu from './Screens/TrangChu';
 import QuanLyHoaDon from './Screens/QuanLyHoaDon';
 import QuanLyNhanVien from './Screens/QuanLyNhanVien';
 import QuanLyThongKe from './Screens/QuanLyThongKe';
+import DrawerNavigation from './Components/DrawerNavigation';
+import QuanLyKhachHang from './Screens/QuanLyKhachHang';
+import CapNhatThongTin from './Screens/Access/CapNhatThongTin';
+import {NhanVienIdContext} from './Components/NhanVienIdContext';
+import ThongKeTheoThoiGian from './Screens/ThongKeTheoThoiGian';
 
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack />
+      <NhanVienIdContext>
+        <Stack />
+      </NhanVienIdContext>
     </NavigationContainer>
   );
 };
-
-const Drawer = () => {
-  const Drawer = createDrawerNavigator();
-  return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Trang Chủ" component={TrangChu} />
-      <Drawer.Screen name="Quản Lý Công Việc" component={QuanLyCongViec} />
-      <Drawer.Screen
-        name="Quản Lý Danh Sách Dịch Vụ"
-        component={QuanLyDanhSachDichVu}
-      />
-      <Drawer.Screen name="Quản Lý Hóa Đơn" component={QuanLyHoaDon} />
-      <Drawer.Screen name="Quản Lý Nhân Viên" component={QuanLyNhanVien} />
-      <Drawer.Screen name="Quản Lý Thống Kê" component={QuanLyThongKe} />
-    </Drawer.Navigator>
-  );
-};
-
 const Stack = () => {
   const Stack = createStackNavigator();
   return (
     <Stack.Navigator>
-       <Stack.Screen
-        name="DangKy"
-        component={DangKy}
+      <Stack.Screen name="ManHinhChao" component={DangNhap} options={{headerShown:false}} />
+      <Stack.Screen
+        name="DangNhap"
+        component={DangNhap}
         options={{headerShown: false}}
       />
-      <Stack.Screen name="DangNhap" component={DangNhap} />
+      <Stack.Screen name="DangKy" component={DangNhap} />
       <Stack.Screen
         name="Drawer"
-        component={Drawer}
-        options={{headerShown: false}}
+        component={DrawerNavigation}
+        options={{headerShown: true}
+      }
       />
-     
-
       <Stack.Screen
         name="ThayDoiMatKhau"
         component={ThayDoiMatKhau}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
-        name="ManHinhChao"
-        component={ManHinhChao}
+        name="CapNhatThongTin"
+        component={CapNhatThongTin}
         options={{headerShown: false}}
       />
 
@@ -77,6 +65,7 @@ const Stack = () => {
       <Stack.Screen name="QuanLyHoaDon" component={QuanLyHoaDon} />
       <Stack.Screen name="QuanLyNhanVien" component={QuanLyNhanVien} />
       <Stack.Screen name="QuanLyThongKe" component={QuanLyThongKe} />
+      <Stack.Screen name="QuanLyKhachHang" component={QuanLyKhachHang} />
     </Stack.Navigator>
   );
 };

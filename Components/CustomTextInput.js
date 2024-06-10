@@ -14,7 +14,7 @@ const CustomTextInput = ({ placeholder, value, onChangeText, style}) => {
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: '#FFF', // Màu sắc thương hiệu riêng
+    backgroundColor: 'white', 
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
